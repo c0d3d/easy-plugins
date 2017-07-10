@@ -1,0 +1,8 @@
+testmodule/src/generated/*
+.idea
+*.iml
+target
+*~
+#*
+*#
+**/target/*
