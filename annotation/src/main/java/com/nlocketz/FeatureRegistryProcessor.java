@@ -53,10 +53,6 @@ public class FeatureRegistryProcessor extends AbstractProcessor {
         return false;
     }
 
-    private void note(String s) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, s);
-    }
-
     private void processService(Element annotationElement, RoundEnvironment roundEnv) {
 
         ServiceAnnotation newService = new ServiceAnnotation(annotationElement, processingEnv);

@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Service(value = "Feature",
-        serviceInterface = "com.nlocketz.example1.ActualFeatureServiceInterface",
+        serviceInterface = ActualFeatureServiceInterface.class,
         outputPackage = "out.pkg")
 public @interface Feature {
     String value();

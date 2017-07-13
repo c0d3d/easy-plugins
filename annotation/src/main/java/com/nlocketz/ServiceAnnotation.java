@@ -6,6 +6,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.util.*;
@@ -18,6 +19,7 @@ class ServiceAnnotation {
     private final String outputPackage;
 
     ServiceAnnotation(Element annotationElement, ProcessingEnvironment procEnv) {
+        Elements elements = procEnv.getElementUtils();
 
         // Annotations are considered interfaces, as per the documentation.
         if (!annotationElement.getKind().isInterface()) {
@@ -35,18 +37,35 @@ class ServiceAnnotation {
                     "Can only have one service annotaion, 0, or more than one detected: " + serviceAnnotations.length);
         }
 
+        AnnotationMirror serviceMirror =
+                getMatchingMirror(
+                        elements.getTypeElement(Service.class.getName()).asType(),
+                        elements.getAllAnnotationMirrors(annotationElement),
+                        procEnv.getTypeUtils());
 
+        // We can't get the interface the normal way (via the annotation's methods)
+        // Since Class<?>'s are a runtime construct and require classloading ... etc
+        String interfaceQName = getValueStringByName(serviceMirror, "serviceInterface");
 
-        serviceInterface = procEnv.getElementUtils().getTypeElement(serviceAnnotations[0].serviceInterface());
-
+        serviceInterface = elements.getTypeElement(interfaceQName);
         if (serviceInterface == null) {
             throw new EZServiceException(
-                    "Couldn't find interface class names: " + serviceAnnotations[0].serviceInterface());
+                    "Couldn't find interface class named: " + interfaceQName);
         }
 
         serviceName = serviceAnnotations[0].value();
         serviceNameFromAnnotaion = serviceAnnotations[0].annotationFieldNameForServiceName();
         outputPackage = serviceAnnotations[0].outputPackage();
+    }
+
+    private AnnotationMirror getMatchingMirror(TypeMirror serviceAnnotationMirror,
+                                               List<? extends AnnotationMirror> mirrors, Types t) {
+        for (AnnotationMirror mirror : mirrors) {
+            if (t.isSameType(mirror.getAnnotationType().asElement().asType(), serviceAnnotationMirror)) {
+                return mirror;
+            }
+        }
+        return null;
     }
 
     /**
@@ -97,13 +116,8 @@ class ServiceAnnotation {
             // Now we need to collect the actual name from the annotation annotating the class
             List<? extends AnnotationMirror> annoMirrors = procEnv.getElementUtils().getAllAnnotationMirrors(element);
 
-            AnnotationMirror selected = null;
-
-            for (AnnotationMirror m : annoMirrors) {
-                if (procEnv.getTypeUtils().isSameType(annotationMarkingSP.asType(), m.getAnnotationType().asElement().asType())) {
-                    selected = m;
-                }
-            }
+            AnnotationMirror selected =
+                    getMatchingMirror(annotationMarkingSP.asType(), annoMirrors, procEnv.getTypeUtils());
 
             if (selected == null) {
                 throw new IllegalStateException("How did this happen?");
@@ -133,7 +147,14 @@ class ServiceAnnotation {
         }
         return null;
     }
-
+    private String getValueStringByName(AnnotationMirror mirror, String name) {
+        AnnotationValue val = getValueByName(mirror, name);
+        if (val == null) {
+            return null;
+        } else {
+            return val.getValue().toString();
+        }
+    }
 
     private boolean containsServiceInterface(List<? extends TypeMirror> mirrors, ProcessingEnvironment procEnv) {
         Types types = procEnv.getTypeUtils();

@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Service {
     String value();
-    String serviceInterface();
+    Class<?> serviceInterface();
 
     // TODO this needs a better name
     /**

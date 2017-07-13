@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class MarkedServiceClass {
+class MarkedServiceClass {
 
     private TypeElement clazzElement;
 
@@ -29,7 +29,7 @@ public class MarkedServiceClass {
 
     private String serviceName;
 
-    public MarkedServiceClass(ProcessingEnvironment env,
+    MarkedServiceClass(ProcessingEnvironment env,
                               TypeElement clazzElement,
                               String serviceName) {
 
@@ -55,6 +55,10 @@ public class MarkedServiceClass {
 
     }
 
+    /**
+     * Gets the {@link TypeName} for this marked service class
+     * @return The typename
+     */
     TypeName getTypeName() {
         return TypeName.get(clazzElement.asType());
     }
@@ -65,16 +69,16 @@ public class MarkedServiceClass {
 
     /**
      * Discovers whether this marked service class has the default and map valued constructors
-     * Assigns findings to {@code }
-     * @param env
-     * @param clazzElement
-     * @param defaultConst
-     * @param mapConst
+     * Assigns findings to the two mutable bools
+     * @param env Current processing environment
+     * @param clazzElement the typeelement corresponding to the class
+     * @param defaultConst the mutable boolean for the default constructor
+     * @param mapConst the mutable boolean for the map constructor.
      */
     private static void computeConstructors(ProcessingEnvironment env,
-                                                 TypeElement clazzElement,
-                                                 MutBool defaultConst,
-                                                 MutBool mapConst) {
+                                            TypeElement clazzElement,
+                                            MutBool defaultConst,
+                                            MutBool mapConst) {
 
         for (Element e : clazzElement.getEnclosedElements()) {
             if (e.getKind() == ElementKind.CONSTRUCTOR) {
@@ -96,7 +100,12 @@ public class MarkedServiceClass {
     }
 
 
-
+    /**
+     * Adds a call to the configuration constructor, if one exists.
+     * Otherwise a default constructor call will be added.
+     * @param getByNameBuilder The builder to add to.
+     * @param mapName The name of the configuration map in scope.
+     */
     void addMapConstructorCall(MethodSpec.Builder getByNameBuilder, String mapName) {
         if (constWithMap != null) {
             getByNameBuilder.addStatement(String.format(constWithMap, "$L"), mapName);
@@ -106,6 +115,11 @@ public class MarkedServiceClass {
         }
     }
 
+    /**
+     * Adds a call to the default constructor for this marked service class to the given method builder.
+     * If the "default" means an empty map, one will be supplied.
+     * @param getByNameBuilder The builder to add the constructions to.
+     */
     void addDefaultConstructorCall(MethodSpec.Builder getByNameBuilder) {
         if (defaultConstString != null) {
             getByNameBuilder.addStatement(defaultConstString);
