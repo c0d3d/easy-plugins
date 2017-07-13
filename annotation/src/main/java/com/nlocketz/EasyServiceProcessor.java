@@ -19,7 +19,7 @@ import java.util.Set;
 @SupportedAnnotationTypes("com.nlocketz.Service")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
-public class FeatureRegistryProcessor extends AbstractProcessor {
+public class EasyServiceProcessor extends AbstractProcessor {
 
     private static final String INSTANCE_FIELD_NAME = "instance";
     private static final String SERVICE_LOADER_FIELD_NAME = "loader";
