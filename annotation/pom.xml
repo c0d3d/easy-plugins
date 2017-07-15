@@ -9,7 +9,6 @@
     <version>1.0-SNAPSHOT</version>
     <properties>
         <auto-service.version>1.0-rc3</auto-service.version>
-        <auto-common.version>0.8</auto-common.version>
         <javapoet.version>1.9.0</javapoet.version>
         <maven-invoker-plugin.version>3.0.0</maven-invoker-plugin.version>
     </properties>
@@ -20,11 +19,6 @@
             <version>${auto-service.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.auto</groupId>
-            <artifactId>auto-common</artifactId>
-            <version>${auto-common.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
             <version>${javapoet.version}</version>
@@ -32,40 +26,40 @@
     </dependencies>
     <build>
         <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-shade-plugin</artifactId>-->
-                <!--<version>3.0.0</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>package</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>shade</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<artifactSet>-->
-                                <!--<includes>-->
-                                    <!--<include>com.google.auto:auto-common</include>-->
-                                    <!--<include>com.google.auto.service:auto-service</include>-->
-                                <!--</includes>-->
-                                <!--<excludes>-->
-                                    <!--<exclude>com.squareup:javapoet</exclude>-->
-                                <!--</excludes>-->
-                            <!--</artifactSet>-->
-                            <!--<relocations>-->
-                                <!--<relocation>-->
-                                    <!--<pattern>com.google.auto.common</pattern>-->
-                                    <!--<shadedPattern>com.google.auto.common</shadedPattern>-->
-                                <!--</relocation>-->
-                                <!--<relocation>-->
-                                    <!--<pattern>com.google.auto.service</pattern>-->
-                                    <!--<shadedPattern>com.google.auto.service</shadedPattern>-->
-                                <!--</relocation>-->
-                            <!--</relocations>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.google.guava:guava</include>
+                                    <include>com.google.auto.service:auto-service</include>
+                                    <include>com.google.auto:auto-common</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>com.squareup:javapoet</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>com.nlocketz.google</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
@@ -79,7 +73,9 @@
                 <executions>
                     <execution>
                         <id>verify</id>
+                        <phase>integration-test</phase>
                         <goals>
+                            <goal>install</goal>
                             <goal>run</goal>
                         </goals>
                         <configuration>
@@ -97,8 +93,6 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <debug>true</debug>
-                    <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
         </plugins>

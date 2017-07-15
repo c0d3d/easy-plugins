@@ -24,11 +24,6 @@
             <artifactId>@project.artifactId@</artifactId>
             <version>@project.version@</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-            <version>1.0-rc3</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
