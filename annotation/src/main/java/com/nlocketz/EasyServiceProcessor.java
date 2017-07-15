@@ -86,13 +86,9 @@ public class EasyServiceProcessor extends AbstractProcessor {
         return TypeSpec.classBuilder(service)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(
-                        FieldSpec.builder(registryName, INSTANCE_FIELD_NAME)
-                                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                                .build())
+                        PoetUtil.privateStaticField(registryName, INSTANCE_FIELD_NAME).build())
                 .addField(
-                        FieldSpec.builder(genericServiceLoaderName, SERVICE_LOADER_FIELD_NAME)
-                                .addModifiers(Modifier.PRIVATE)
-                                .build())
+                        PoetUtil.privateField(genericServiceLoaderName, SERVICE_LOADER_FIELD_NAME).build())
                 .addMethod(
                         MethodSpec.methodBuilder("getInstance")
                                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
@@ -149,22 +145,17 @@ public class EasyServiceProcessor extends AbstractProcessor {
     }
 
     private TypeSpec buildServiceInterfaceFor(ServiceAnnotation newService) {
+        TypeName providerTypeName = newService.getProviderReturnTypeName();
         return TypeSpec.interfaceBuilder(newService.getServiceInterfaceName())
                 .addMethod(
-                        MethodSpec.methodBuilder(GET_NAME_METHOD_NAME)
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .returns(STRING_TYPE_NAME)
+                        PoetUtil.publicAbstractMethod(GET_NAME_METHOD_NAME, STRING_TYPE_NAME)
                                 .build())
                 .addMethod(
-                        MethodSpec.methodBuilder(CREATE_NEW_METHOD_NAME)
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .returns(newService.getProviderReturnTypeName())
+                        PoetUtil.publicAbstractMethod(CREATE_NEW_METHOD_NAME, providerTypeName)
                                 .build())
                 .addMethod(
-                        MethodSpec.methodBuilder(CREATE_NEW_WITH_CONFIG_METHOD_NAME)
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        PoetUtil.publicAbstractMethod(CREATE_NEW_WITH_CONFIG_METHOD_NAME, providerTypeName)
                                 .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME)
-                                .returns(newService.getProviderReturnTypeName())
                                 .build())
                 .build();
     }
@@ -174,7 +165,7 @@ public class EasyServiceProcessor extends AbstractProcessor {
 
         MethodSpec getName = MethodSpec.methodBuilder(GET_NAME_METHOD_NAME)
                 .returns(STRING_TYPE_NAME)
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addStatement("return $L", msc.getServiceName())
                 .build();
 
