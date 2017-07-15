@@ -32,40 +32,40 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.google.auto:auto-common</include>
-                                    <include>com.google.auto.service:auto-service</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>com.squareup:javapoet</exclude>
-                                </excludes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.google.auto.common</pattern>
-                                    <shadedPattern>com.nlocketz.easyservice.auto.common</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.google.auto.service</pattern>
-                                    <shadedPattern>com.nlocketz.easyservice.auto.service</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-shade-plugin</artifactId>-->
+                <!--<version>3.0.0</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>shade</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<artifactSet>-->
+                                <!--<includes>-->
+                                    <!--<include>com.google.auto:auto-common</include>-->
+                                    <!--<include>com.google.auto.service:auto-service</include>-->
+                                <!--</includes>-->
+                                <!--<excludes>-->
+                                    <!--<exclude>com.squareup:javapoet</exclude>-->
+                                <!--</excludes>-->
+                            <!--</artifactSet>-->
+                            <!--<relocations>-->
+                                <!--<relocation>-->
+                                    <!--<pattern>com.google.auto.common</pattern>-->
+                                    <!--<shadedPattern>com.google.auto.common</shadedPattern>-->
+                                <!--</relocation>-->
+                                <!--<relocation>-->
+                                    <!--<pattern>com.google.auto.service</pattern>-->
+                                    <!--<shadedPattern>com.google.auto.service</shadedPattern>-->
+                                <!--</relocation>-->
+                            <!--</relocations>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
@@ -78,11 +78,15 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>integration-test</id>
+                        <id>verify</id>
                         <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
+                            <goal>run</goal>
                         </goals>
+                        <configuration>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

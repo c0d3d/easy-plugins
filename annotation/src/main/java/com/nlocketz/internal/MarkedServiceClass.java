@@ -1,6 +1,6 @@
 package com.nlocketz.internal;
 
-import com.nlocketz.internal.EZServiceException;
+import com.nlocketz.EZServiceException;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 

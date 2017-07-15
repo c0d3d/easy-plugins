@@ -22,16 +22,12 @@ final class PoetUtil {
         return privateField(type, name).addModifiers(Modifier.STATIC);
     }
 
-    static FieldSpec.Builder privateStaticField(Type type, String name) {
-        return privateField(type, name).addModifiers(Modifier.STATIC);
-    }
-
     static MethodSpec.Builder publicMethod(String name, TypeName returnType) {
         return MethodSpec.methodBuilder(name).addModifiers(Modifier.PUBLIC).returns(returnType);
     }
 
-    static MethodSpec.Builder publicStaticMethod(String name, TypeName returnType) {
-        return publicMethod(name, returnType).addModifiers(Modifier.STATIC);
+    static MethodSpec.Builder publicFinalMethod(String name, TypeName returnType) {
+        return publicMethod(name, returnType).addModifiers(Modifier.FINAL);
     }
 
     static MethodSpec.Builder publicAbstractMethod(String name, TypeName returnType) {

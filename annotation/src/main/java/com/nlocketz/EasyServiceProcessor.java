@@ -2,9 +2,7 @@ package com.nlocketz;
 
 
 import com.google.auto.service.AutoService;
-import com.nlocketz.internal.EZServiceException;
-import com.nlocketz.internal.EntireServiceFileBuilder;
-import com.nlocketz.internal.ServiceAnnotation;
+import com.nlocketz.internal.CompleteServiceBuilder;
 import com.squareup.javapoet.JavaFile;
 
 import javax.annotation.processing.*;
@@ -22,30 +20,38 @@ import java.util.Set;
 @AutoService(Processor.class)
 public class EasyServiceProcessor extends AbstractProcessor {
 
-
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
 
         try {
             for (TypeElement ele : annotations) {
+                // For each annotated annotation we build and generate new source files.
                 for (Element newService : roundEnvironment.getElementsAnnotatedWith(ele)) {
                     processService(newService, roundEnvironment);
                 }
             }
         } catch (EZServiceException e) {
+            // See comment on EZServiceException
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         } catch (Exception e) {
+            // Everything else is a problem ...
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
+
+        // We are done here ...
         return false;
     }
 
+    /**
+     * Generates all the source files for the marked {@link Element}.
+     * The marked element should correspond to a user written annotation annotated with {@link Service}.
+     * @param annotationElement The marked element.
+     * @param roundEnv The current round environment.
+     */
     private void processService(Element annotationElement, RoundEnvironment roundEnv) {
-        ServiceAnnotation newService = new ServiceAnnotation(annotationElement, processingEnv);
-        processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.NOTE, "Making services for " + newService.getServiceInterfaceName());
-
-        EntireServiceFileBuilder builder = new EntireServiceFileBuilder();
-        List<JavaFile> allFiles = builder.buildFiles(newService, roundEnv, processingEnv);
+        // All the generated files for the marked annotation
+        List<JavaFile> allFiles =
+                CompleteServiceBuilder.buildServiceFiles(annotationElement, roundEnv, processingEnv);
         for (JavaFile file : allFiles) {
             writeFile(file);
         }
@@ -59,6 +65,5 @@ public class EasyServiceProcessor extends AbstractProcessor {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

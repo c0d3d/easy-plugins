@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
+import static com.nlocketz.internal.PoetUtil.publicFinalMethod;
 
 /**
  * Builds the service providers for our internal service
@@ -32,21 +33,16 @@ public class ServiceProviderFileBuilder implements ServiceFileBuilder {
     private JavaFile buildSingleMarkedClass(MarkedServiceClass marked, String interfaceName, String outputPkg) {
         String className = marked.getNewServiceClassName();
 
-        MethodSpec getName = MethodSpec.methodBuilder(GET_NAME_METHOD_NAME)
-                .returns(STRING_TYPE_NAME)
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+        MethodSpec getName = publicFinalMethod(GET_NAME_METHOD_NAME, STRING_TYPE_NAME)
                 .addStatement("return $L", marked.getServiceName())
                 .build();
 
-        MethodSpec.Builder createBuilder = MethodSpec.methodBuilder(CREATE_NEW_METHOD_NAME)
-                .returns(marked.getTypeName())
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+        MethodSpec.Builder createBuilder = publicFinalMethod(CREATE_NEW_METHOD_NAME, marked.getTypeName());
         marked.addDefaultConstructorCall(createBuilder);
 
-        MethodSpec.Builder createWithConfigBuilder = MethodSpec.methodBuilder(CREATE_NEW_WITH_CONFIG_METHOD_NAME)
-                .returns(marked.getTypeName())
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME);
+        MethodSpec.Builder createWithConfigBuilder =
+                publicFinalMethod(CREATE_NEW_WITH_CONFIG_METHOD_NAME, marked.getTypeName())
+                        .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME);
         marked.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
 
         TypeSpec clazz = TypeSpec.classBuilder(className)
@@ -61,6 +57,7 @@ public class ServiceProviderFileBuilder implements ServiceFileBuilder {
                 .addMethod(createBuilder.build())
                 .addMethod(createWithConfigBuilder.build())
                 .build();
+
         return JavaFile.builder(outputPkg, clazz).build();
     }
 }
