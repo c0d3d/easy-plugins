@@ -2,17 +2,18 @@ package com.nlocketz;
 
 
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.*;
+import com.nlocketz.internal.EZServiceException;
+import com.nlocketz.internal.EntireServiceFileBuilder;
+import com.nlocketz.internal.ServiceAnnotation;
+import com.squareup.javapoet.JavaFile;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.IOException;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.List;
 import java.util.Set;
 
 
@@ -20,21 +21,6 @@ import java.util.Set;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
 public class EasyServiceProcessor extends AbstractProcessor {
-
-    private static final String INSTANCE_FIELD_NAME = "instance";
-    private static final String SERVICE_LOADER_FIELD_NAME = "loader";
-    private static final String PROVIDER_NAME_ARG_NAME = "name";
-    private static final String CONFIG_NAME_ARG_NAME = "config";
-
-    private static final ClassName STRING_CLASS_NAME = ClassName.get(String.class);
-    private static final TypeName STRING_TYPE_NAME = TypeName.get(String.class);
-    private static final ClassName MAP_CLASS_NAME = ClassName.get(Map.class);
-    private static final ParameterizedTypeName MAP_STRING_STRING_NAME =
-            ParameterizedTypeName.get(MAP_CLASS_NAME, STRING_CLASS_NAME, STRING_CLASS_NAME);
-    private static final String GET_NAME_METHOD_NAME = "getProviderName";
-    private static final String CREATE_NEW_METHOD_NAME = "create";
-    private static final String CREATE_NEW_WITH_CONFIG_METHOD_NAME = "createWithConfig";
-    private static final String CONFIG_ARG_NAME = "config";
 
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
@@ -54,86 +40,18 @@ public class EasyServiceProcessor extends AbstractProcessor {
     }
 
     private void processService(Element annotationElement, RoundEnvironment roundEnv) {
-
         ServiceAnnotation newService = new ServiceAnnotation(annotationElement, processingEnv);
         processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.NOTE, "Making services for " +newService.getServiceInterfaceName());
+                Diagnostic.Kind.NOTE, "Making services for " + newService.getServiceInterfaceName());
 
-        Set<? extends MarkedServiceClass> markedClasses = newService.getMarkedClasses(roundEnv, processingEnv);
-        TypeSpec serviceInterface = buildServiceInterfaceFor(newService);
-        writeSpec(serviceInterface, newService.getOutputPackage());
-
-        for (MarkedServiceClass msc : markedClasses) {
-            TypeSpec singleClass =
-                    buildSingleClass(msc, newService.getServiceInterfaceName(), newService.getOutputPackage());
-            writeSpec(singleClass, newService.getOutputPackage());
+        EntireServiceFileBuilder builder = new EntireServiceFileBuilder();
+        List<JavaFile> allFiles = builder.buildFiles(newService, roundEnv, processingEnv);
+        for (JavaFile file : allFiles) {
+            writeFile(file);
         }
-
-        TypeSpec registryClass = buildRegistryClass(newService.getServiceRegistryName(), newService);
-        writeSpec(registryClass, newService.getOutputPackage());
     }
 
-
-    private TypeSpec buildRegistryClass(String service, ServiceAnnotation annotation) {
-        ClassName spiName = ClassName.get(annotation.getOutputPackage(), annotation.getServiceInterfaceName());
-        ClassName registryName = ClassName.get(annotation.getOutputPackage(), service);
-        ClassName serviceLoaderName = ClassName.get(ServiceLoader.class);
-        ClassName mapClassName = ClassName.get(Map.class);
-        ClassName stringClassName = ClassName.get(String.class);
-        ParameterizedTypeName genericServiceLoaderName = ParameterizedTypeName.get(serviceLoaderName, spiName);
-        ParameterizedTypeName genericMap = ParameterizedTypeName.get(mapClassName, stringClassName, stringClassName);
-
-        return TypeSpec.classBuilder(service)
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addField(
-                        PoetUtil.privateStaticField(registryName, INSTANCE_FIELD_NAME).build())
-                .addField(
-                        PoetUtil.privateField(genericServiceLoaderName, SERVICE_LOADER_FIELD_NAME).build())
-                .addMethod(
-                        MethodSpec.methodBuilder("getInstance")
-                                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                                .returns(registryName)
-                                .beginControlFlow("if ($L == null)", INSTANCE_FIELD_NAME)
-                                .addStatement("$L = new $T()", INSTANCE_FIELD_NAME, registryName)
-                                .endControlFlow()
-                                .addStatement("return $L", INSTANCE_FIELD_NAME)
-                                .build())
-                .addMethod(
-                        MethodSpec.constructorBuilder()
-                                .addModifiers(Modifier.PRIVATE)
-                                .addStatement("$L = $T.load($T.class)",
-                                        SERVICE_LOADER_FIELD_NAME,
-                                        ServiceLoader.class,
-                                        spiName)
-                                .build())
-                .addMethod(
-                        MethodSpec.methodBuilder("get"+annotation.getServiceName()+"ByName")
-                                .returns(annotation.getProviderReturnTypeName())
-                                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                                .addParameter(String.class, PROVIDER_NAME_ARG_NAME)
-                                .beginControlFlow("for ($T s : getInstance().$L)", spiName, SERVICE_LOADER_FIELD_NAME)
-                                .beginControlFlow("if (s.getProviderName().equals($L))", PROVIDER_NAME_ARG_NAME)
-                                .addStatement("return s.create()")
-                                .endControlFlow()
-                                .endControlFlow()
-                                .addStatement("return null").build())
-                .addMethod(
-                        MethodSpec.methodBuilder("get"+annotation.getServiceName()+"ByNameWithConfig")
-                                .returns(annotation.getProviderReturnTypeName())
-                                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                                .addParameter(String.class, PROVIDER_NAME_ARG_NAME)
-                                .addParameter(genericMap, CONFIG_ARG_NAME)
-                                .beginControlFlow("for ($T s : getInstance().$L)", spiName, SERVICE_LOADER_FIELD_NAME)
-                                .beginControlFlow("if (s.getProviderName().equals($L))", PROVIDER_NAME_ARG_NAME)
-                                .addStatement("return s.createWithConfig($L)", CONFIG_NAME_ARG_NAME)
-                                .endControlFlow()
-                                .endControlFlow()
-                                .addStatement("return null").build())
-                .build();
-    }
-
-    private void writeSpec(TypeSpec spec, String outputPkg) {
-        JavaFile file = JavaFile.builder(outputPkg, spec).build();
+    private void writeFile(JavaFile file) {
         try {
             file.writeTo(processingEnv.getFiler());
         } catch (FilerException e) {
@@ -142,55 +60,5 @@ public class EasyServiceProcessor extends AbstractProcessor {
             throw new RuntimeException(e);
         }
 
-    }
-
-    private TypeSpec buildServiceInterfaceFor(ServiceAnnotation newService) {
-        TypeName providerTypeName = newService.getProviderReturnTypeName();
-        return TypeSpec.interfaceBuilder(newService.getServiceInterfaceName())
-                .addMethod(
-                        PoetUtil.publicAbstractMethod(GET_NAME_METHOD_NAME, STRING_TYPE_NAME)
-                                .build())
-                .addMethod(
-                        PoetUtil.publicAbstractMethod(CREATE_NEW_METHOD_NAME, providerTypeName)
-                                .build())
-                .addMethod(
-                        PoetUtil.publicAbstractMethod(CREATE_NEW_WITH_CONFIG_METHOD_NAME, providerTypeName)
-                                .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME)
-                                .build())
-                .build();
-    }
-
-    private TypeSpec buildSingleClass(MarkedServiceClass msc, String interfaceName, String outputPkg) {
-        String className = msc.getNewServiceClassName();
-
-        MethodSpec getName = MethodSpec.methodBuilder(GET_NAME_METHOD_NAME)
-                .returns(STRING_TYPE_NAME)
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addStatement("return $L", msc.getServiceName())
-                .build();
-
-        MethodSpec.Builder createBuilder = MethodSpec.methodBuilder(CREATE_NEW_METHOD_NAME)
-                .returns(msc.getTypeName())
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-        msc.addDefaultConstructorCall(createBuilder);
-
-        MethodSpec.Builder createWithConfigBuilder = MethodSpec.methodBuilder(CREATE_NEW_WITH_CONFIG_METHOD_NAME)
-                .returns(msc.getTypeName())
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME);
-        msc.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
-
-        return TypeSpec.classBuilder(className)
-                .addAnnotation(
-                        AnnotationSpec.builder(AutoService.class)
-                                .addMember("value", "$L.class", interfaceName)
-                                .build())
-                .addSuperinterface(ClassName.get(outputPkg, interfaceName))
-                .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addMethod(getName)
-                .addMethod(createBuilder.build())
-                .addMethod(createWithConfigBuilder.build())
-                .build();
     }
 }

@@ -1,0 +1,66 @@
+package com.nlocketz.internal;
+
+import com.google.auto.service.AutoService;
+import com.squareup.javapoet.*;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Modifier;
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.nlocketz.internal.GeneratedNameConstants.*;
+
+/**
+ * Builds the service providers for our internal service
+ * (the one created by {@link ServiceProviderInterfaceFileBuilder}).
+ * There will be one provider for every {@link MarkedServiceClass} within a given {@link ServiceAnnotation}.
+ */
+public class ServiceProviderFileBuilder implements ServiceFileBuilder {
+    @Override
+    public List<JavaFile> buildFiles(ServiceAnnotation annotation, RoundEnvironment roundEnv, ProcessingEnvironment procEnv) {
+        List<JavaFile> result = new LinkedList<>();
+        for (MarkedServiceClass marked : annotation.getMarkedClasses(roundEnv, procEnv)) {
+            result.add(buildSingleMarkedClass(
+                    marked,
+                    annotation.getServiceInterfaceName(),
+                    annotation.getOutputPackage()));
+        }
+        return result;
+    }
+
+    private JavaFile buildSingleMarkedClass(MarkedServiceClass marked, String interfaceName, String outputPkg) {
+        String className = marked.getNewServiceClassName();
+
+        MethodSpec getName = MethodSpec.methodBuilder(GET_NAME_METHOD_NAME)
+                .returns(STRING_TYPE_NAME)
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addStatement("return $L", marked.getServiceName())
+                .build();
+
+        MethodSpec.Builder createBuilder = MethodSpec.methodBuilder(CREATE_NEW_METHOD_NAME)
+                .returns(marked.getTypeName())
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+        marked.addDefaultConstructorCall(createBuilder);
+
+        MethodSpec.Builder createWithConfigBuilder = MethodSpec.methodBuilder(CREATE_NEW_WITH_CONFIG_METHOD_NAME)
+                .returns(marked.getTypeName())
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME);
+        marked.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
+
+        TypeSpec clazz = TypeSpec.classBuilder(className)
+                .addAnnotation(
+                        AnnotationSpec.builder(AutoService.class)
+                                .addMember("value", "$L.class", interfaceName)
+                                .build())
+                .addSuperinterface(ClassName.get(outputPkg, interfaceName))
+                .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addMethod(getName)
+                .addMethod(createBuilder.build())
+                .addMethod(createWithConfigBuilder.build())
+                .build();
+        return JavaFile.builder(outputPkg, clazz).build();
+    }
+}

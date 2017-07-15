@@ -1,4 +1,6 @@
-package com.nlocketz;
+package com.nlocketz.internal;
+
+import com.nlocketz.EasyServiceProcessor;
 
 import javax.annotation.processing.RoundEnvironment;
 import java.util.Set;
@@ -9,7 +11,7 @@ import java.util.Set;
  * in error messages to the user, and exception which result from bugs inside our code.
  * @see EasyServiceProcessor#process(Set, RoundEnvironment)
  */
-class EZServiceException extends RuntimeException {
+public class EZServiceException extends RuntimeException {
     public EZServiceException(String s) {
         super(s);
     }

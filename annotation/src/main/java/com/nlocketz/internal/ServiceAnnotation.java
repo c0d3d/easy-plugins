@@ -1,5 +1,6 @@
-package com.nlocketz;
+package com.nlocketz.internal;
 
+import com.nlocketz.Service;
 import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -11,14 +12,14 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.util.*;
 
-class ServiceAnnotation {
+public class ServiceAnnotation {
     private final TypeElement annotationMarkingSP;
     private final TypeElement serviceInterface;
     private final String serviceName;
     private final String serviceNameFromAnnotaion;
     private final String outputPackage;
 
-    ServiceAnnotation(Element annotationElement, ProcessingEnvironment procEnv) {
+    public ServiceAnnotation(Element annotationElement, ProcessingEnvironment procEnv) {
         Elements elements = procEnv.getElementUtils();
 
         // Annotations are considered interfaces, as per the documentation.
@@ -169,7 +170,7 @@ class ServiceAnnotation {
         return false;
     }
 
-    String getServiceInterfaceName() {
+    public String getServiceInterfaceName() {
         return serviceName+"Provider";
     }
 

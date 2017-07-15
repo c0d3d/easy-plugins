@@ -1,8 +1,6 @@
-package com.nlocketz;
+package com.nlocketz.internal;
 
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 import java.lang.reflect.Type;

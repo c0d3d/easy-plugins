@@ -1,14 +1,12 @@
-package com.nlocketz;
+package com.nlocketz.internal;
 
+import com.nlocketz.internal.EZServiceException;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import javax.tools.Diagnostic;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
