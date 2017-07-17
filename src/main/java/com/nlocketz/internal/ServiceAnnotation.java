@@ -2,7 +2,10 @@ package com.nlocketz.internal;
 
 import com.nlocketz.EZServiceException;
 import com.nlocketz.Service;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.WildcardTypeName;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -15,7 +18,7 @@ import java.util.*;
 
 class ServiceAnnotation {
     private final TypeElement annotationMarkingSP;
-    private final TypeElement serviceInterface;
+    private final TypeElement serviceClass;
     private final String serviceName;
     private final String serviceNameFromAnnotaion;
     private final String outputPackage;
@@ -49,8 +52,8 @@ class ServiceAnnotation {
         // Since Class<?>'s are a runtime construct and require classloading ... etc
         String interfaceQName = getValueStringByName(serviceMirror, "serviceInterface");
 
-        serviceInterface = elements.getTypeElement(interfaceQName);
-        if (serviceInterface == null) {
+        serviceClass = elements.getTypeElement(interfaceQName);
+        if (serviceClass == null) {
             throw new EZServiceException(
                     "Couldn't find interface class named: " + interfaceQName);
         }
@@ -108,11 +111,12 @@ class ServiceAnnotation {
                         "You can only mark concrete classes with service marking annotations, found abstract: " + e.toString());
             }
             TypeElement element = (TypeElement) e;
-            List<? extends TypeMirror> implemented = element.getInterfaces();
 
-            if (!containsServiceInterface(implemented, procEnv)) {
+            if (procEnv.getTypeUtils()
+                    .isAssignable(serviceClass.asType(), element.asType())) {
                 throw new EZServiceException("Classes marked with "
-                        + annotationMarkingSP.getQualifiedName() + " must implement " + serviceInterface.toString());
+                        + annotationMarkingSP.getQualifiedName() + " must implement/extend " + serviceClass.toString()
+                        + ". Found: " + element.getQualifiedName());
             }
 
             // Now we need to collect the actual name from the annotation annotating the class
@@ -160,11 +164,12 @@ class ServiceAnnotation {
 
     private boolean containsServiceInterface(List<? extends TypeMirror> mirrors, ProcessingEnvironment procEnv) {
         Types types = procEnv.getTypeUtils();
-        TypeMirror requiredInterfaceMirror = serviceInterface.asType();
+        TypeMirror requiredInterfaceMirror = serviceClass.asType();
         for (TypeMirror mirror : mirrors) {
             // We currently ignore generics (hence erasure)
             // TODO figure out some way to support specific type parameters only
-            if (types.isSameType(types.erasure(mirror), requiredInterfaceMirror)){
+
+            if (types.isAssignable(types.erasure(mirror), types.erasure(requiredInterfaceMirror))){
                 return true;
             }
         }
@@ -180,7 +185,21 @@ class ServiceAnnotation {
     }
 
     TypeName getProviderReturnTypeName() {
-        return TypeName.get(serviceInterface.asType());
+        int paramCount = serviceClass.getTypeParameters().size();
+        if (paramCount > 0) {
+            TypeName[] params = new TypeName[paramCount];
+            for (int i = 0; i < paramCount; i++) {
+                params[i] = WildcardTypeName.subtypeOf(TypeName.OBJECT);
+            }
+
+            return ParameterizedTypeName.get(ClassName.get(serviceClass), params);
+        } else {
+            return ClassName.get(serviceClass);
+        }
+    }
+
+    TypeMirror getProviderReturnTypeMirror() {
+        return serviceClass.asType();
     }
 
     String getServiceName() {
