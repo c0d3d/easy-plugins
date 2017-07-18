@@ -11,6 +11,7 @@
         <auto-service.version>1.0-rc3</auto-service.version>
         <javapoet.version>1.9.0</javapoet.version>
         <maven-invoker-plugin.version>3.0.0</maven-invoker-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
