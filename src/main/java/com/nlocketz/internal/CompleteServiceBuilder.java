@@ -14,7 +14,8 @@ public final class CompleteServiceBuilder implements ServiceFileBuilder {
     private static final List<ServiceFileBuilder> subcomponentBuilders = Arrays.asList(
             new ServiceProviderInterfaceFileBuilder(),
             new ServiceRegistryFileBuilder(),
-            new ServiceProviderFileBuilder()
+            new ServiceProviderFileBuilder(),
+            new ServiceAnnotationProcessorBuilder()
     );
 
     private CompleteServiceBuilder() {

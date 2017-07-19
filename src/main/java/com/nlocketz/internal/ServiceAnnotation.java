@@ -176,6 +176,10 @@ class ServiceAnnotation {
         return false;
     }
 
+    public TypeMirror getMirrorForMarkerAnnotation() {
+        return annotationMarkingSP.asType();
+    }
+
     public String getServiceInterfaceName() {
         return serviceName+"Provider";
     }
@@ -189,7 +193,7 @@ class ServiceAnnotation {
         if (paramCount > 0) {
             TypeName[] params = new TypeName[paramCount];
             for (int i = 0; i < paramCount; i++) {
-                params[i] = WildcardTypeName.subtypeOf(TypeName.OBJECT);
+                params[i] = PoetUtil.wildcardType();
             }
 
             return ParameterizedTypeName.get(ClassName.get(serviceClass), params);

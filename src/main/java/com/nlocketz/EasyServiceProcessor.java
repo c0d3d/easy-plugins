@@ -18,7 +18,7 @@ import java.util.Set;
 @SupportedAnnotationTypes("com.nlocketz.Service")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
-public class EasyServiceProcessor extends AbstractProcessor {
+public final class EasyServiceProcessor extends AbstractProcessor {
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
 

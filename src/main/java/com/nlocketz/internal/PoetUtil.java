@@ -10,6 +10,18 @@ final class PoetUtil {
 
     }
 
+    static TypeName wildcardType() {
+        return wildcardType(TypeName.OBJECT);
+    }
+
+    static TypeName wildcardType(TypeName upperBound) {
+        return WildcardTypeName.subtypeOf(upperBound);
+    }
+
+    static TypeName wildcardType(Class<?> upperBoundRaw) {
+        return WildcardTypeName.subtypeOf(ClassName.get(upperBoundRaw));
+    }
+
     static FieldSpec.Builder privateField(Type fType, String name) {
         return FieldSpec.builder(fType, name, Modifier.PRIVATE);
     }
@@ -32,5 +44,9 @@ final class PoetUtil {
 
     static MethodSpec.Builder publicAbstractMethod(String name, TypeName returnType) {
         return publicMethod(name, returnType).addModifiers(Modifier.ABSTRACT);
+    }
+
+    static MethodSpec.Builder privateMethod(String name, TypeName returnType) {
+        return MethodSpec.methodBuilder(name).returns(returnType).addModifiers(Modifier.PRIVATE);
     }
 }
