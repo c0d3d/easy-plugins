@@ -5,7 +5,6 @@ import com.nlocketz.Service;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.WildcardTypeName;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -22,6 +21,25 @@ class ServiceAnnotation {
     private final String serviceName;
     private final String serviceNameFromAnnotaion;
     private final String outputPackage;
+
+    /**
+     * This constructor is used by the user's generated specialized processor.
+     * The info that would normally be given by the use of {@link Service} is provided in
+     * {@link MarkerAnnotation}.
+     * @param userAnnotationClass The annotation that will annotate user created services.
+     * @param info Configuration information.
+     * @param procEnv The current processing environment.
+     */
+    ServiceAnnotation(TypeElement userAnnotationClass, MarkerAnnotation info, ProcessingEnvironment procEnv) {
+        annotationMarkingSP = userAnnotationClass;
+        serviceClass = procEnv.getElementUtils().getTypeElement(info.getSiName());
+        if (serviceClass == null) {
+            throw new IllegalStateException("User service interface class not found! " + info.getSiName());
+        }
+        serviceName = info.getServiceName();
+        serviceNameFromAnnotaion = info.getServiceNameFromAnnotation();
+        outputPackage = info.getOutputPackage();
+    }
 
     ServiceAnnotation(Element annotationElement, ProcessingEnvironment procEnv) {
         Elements elements = procEnv.getElementUtils();
@@ -212,4 +230,8 @@ class ServiceAnnotation {
     String getOutputPackage() {
         return outputPackage;
     }
+    String getServiceNameFromAnnotaion() {
+        return serviceNameFromAnnotaion;
+    }
+
 }

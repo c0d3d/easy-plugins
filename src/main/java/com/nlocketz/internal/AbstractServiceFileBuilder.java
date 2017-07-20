@@ -9,7 +9,14 @@ import java.util.List;
 /**
  * Builds one or more {@link JavaFile}s for a {@link ServiceAnnotation}
  */
-public interface ServiceFileBuilder {
+abstract class AbstractServiceFileBuilder {
+
+    protected CompleteServiceBuilder overallBuilder;
+
+    AbstractServiceFileBuilder(CompleteServiceBuilder overallBuilder) {
+        this.overallBuilder = overallBuilder;
+    }
+
 
     /**
      * Generates new java files to be used as part of the new service given by {@code annotation}.
@@ -18,7 +25,7 @@ public interface ServiceFileBuilder {
      * @param procEnv The current processing environment
      * @return The newly built java files
      */
-    List<JavaFile> buildFiles(ServiceAnnotation annotation,
+    abstract List<JavaFile> buildFiles(ServiceAnnotation annotation,
                               RoundEnvironment roundEnv,
                               ProcessingEnvironment procEnv);
 }

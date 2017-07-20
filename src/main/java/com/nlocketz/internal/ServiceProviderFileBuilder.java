@@ -1,11 +1,11 @@
 package com.nlocketz.internal;
 
-import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,21 +17,37 @@ import static com.nlocketz.internal.PoetUtil.publicFinalMethod;
  * (the one created by {@link ServiceProviderInterfaceFileBuilder}).
  * There will be one provider for every {@link MarkedServiceClass} within a given {@link ServiceAnnotation}.
  */
-public class ServiceProviderFileBuilder implements ServiceFileBuilder {
+public class ServiceProviderFileBuilder extends AbstractServiceFileBuilder {
+
+    ServiceProviderFileBuilder(CompleteServiceBuilder overallBuilder) {
+        super(overallBuilder);
+    }
+
     @Override
     public List<JavaFile> buildFiles(ServiceAnnotation annotation, RoundEnvironment roundEnv, ProcessingEnvironment procEnv) {
         List<JavaFile> result = new LinkedList<>();
+        List<String> processorQNames = new LinkedList<>();
         for (MarkedServiceClass marked : annotation.getMarkedClasses(roundEnv, procEnv)) {
             result.add(buildSingleMarkedClass(
                     marked,
                     annotation.getServiceInterfaceName(),
-                    annotation.getOutputPackage()));
+                    annotation.getOutputPackage(),
+                    processorQNames));
         }
+        String spInterface = annotation.getOutputPackage() + "." + annotation.getServiceInterfaceName();
+        overallBuilder.addToSpiOutput(spInterface, new HashSet<>(processorQNames));
         return result;
     }
 
-    private JavaFile buildSingleMarkedClass(MarkedServiceClass marked, String interfaceName, String outputPkg) {
+
+
+    private JavaFile buildSingleMarkedClass(MarkedServiceClass marked,
+                                            String interfaceName,
+                                            String outputPkg,
+                                            List<String> processorQNames) {
+
         String className = marked.getNewServiceClassName();
+        processorQNames.add(outputPkg + "." + className);
 
         MethodSpec getName = publicFinalMethod(GET_NAME_METHOD_NAME, STRING_TYPE_NAME)
                 .addStatement("return $L", marked.getServiceName())
@@ -46,10 +62,10 @@ public class ServiceProviderFileBuilder implements ServiceFileBuilder {
         marked.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
 
         TypeSpec clazz = TypeSpec.classBuilder(className)
-                .addAnnotation(
-                        AnnotationSpec.builder(AutoService.class)
-                                .addMember("value", "$L.class", interfaceName)
-                                .build())
+//                .addAnnotation(
+//                        AnnotationSpec.builder(AutoService.class)
+//                                .addMember("value", "$L.class", interfaceName)
+//                                .build())
                 .addSuperinterface(ClassName.get(outputPkg, interfaceName))
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)

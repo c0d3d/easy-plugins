@@ -14,7 +14,12 @@ import java.util.ServiceLoader;
  * Builds the "registry" for a service.
  * The registry is the class that you can query for different service providers, and construct them.
  */
-class ServiceRegistryFileBuilder implements ServiceFileBuilder {
+class ServiceRegistryFileBuilder extends AbstractServiceFileBuilder {
+
+    ServiceRegistryFileBuilder(CompleteServiceBuilder overallBuilder) {
+        super(overallBuilder);
+    }
+
     @Override
     public List<JavaFile> buildFiles(ServiceAnnotation annotation, RoundEnvironment roundEnv, ProcessingEnvironment procEnv) {
         String registryClassName = annotation.getServiceRegistryName();

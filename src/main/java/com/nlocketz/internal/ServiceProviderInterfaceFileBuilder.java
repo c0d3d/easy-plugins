@@ -11,7 +11,12 @@ import java.util.List;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
 
-public class ServiceProviderInterfaceFileBuilder implements ServiceFileBuilder {
+public class ServiceProviderInterfaceFileBuilder extends AbstractServiceFileBuilder {
+
+    ServiceProviderInterfaceFileBuilder(CompleteServiceBuilder overallBuilder) {
+        super(overallBuilder);
+    }
+
     @Override
     public List<JavaFile> buildFiles(ServiceAnnotation annotation,
                                      RoundEnvironment roundEnv,

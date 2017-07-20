@@ -50,6 +50,7 @@ final class GeneratedNameConstants {
     static final ClassName AUTO_SERVICE_CLASS_NAME = ClassName.get(AutoService.class);
     static final ClassName PROCESSOR_CLASS_NAME = ClassName.get(Processor.class);
     static final ClassName FILER_EXCEPTION_CLASS_NAME = ClassName.get(FilerException.class);
+    static final ClassName MARKER_ANNOTATION_CLASS_NAME = ClassName.get(MarkerAnnotation.class);
 
     /* Type names */
     static final TypeName STRING_TYPE_NAME = TypeName.get(String.class);

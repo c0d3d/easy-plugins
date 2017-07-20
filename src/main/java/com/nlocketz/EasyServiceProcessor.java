@@ -38,6 +38,10 @@ public final class EasyServiceProcessor extends AbstractProcessor {
             throw new RuntimeException(e);
         }
 
+
+        CompleteServiceBuilder.writeSPIS(processingEnv.getFiler());
+
+
         // We are done here ...
         return false;
     }
@@ -55,6 +59,7 @@ public final class EasyServiceProcessor extends AbstractProcessor {
         for (JavaFile file : allFiles) {
             writeFile(file);
         }
+
     }
 
     private void writeFile(JavaFile file) {

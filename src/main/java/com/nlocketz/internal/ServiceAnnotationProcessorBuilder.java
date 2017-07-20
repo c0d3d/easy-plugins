@@ -3,20 +3,21 @@ package com.nlocketz.internal;
 import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.*;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.*;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
 
-public class ServiceAnnotationProcessorBuilder implements ServiceFileBuilder {
+public class ServiceAnnotationProcessorBuilder extends AbstractServiceFileBuilder {
+
+    ServiceAnnotationProcessorBuilder(CompleteServiceBuilder overallBuilder) {
+        super(overallBuilder);
+    }
+
     @Override
     public List<JavaFile> buildFiles(ServiceAnnotation annotation,
                                      RoundEnvironment roundEnv,
@@ -29,23 +30,31 @@ public class ServiceAnnotationProcessorBuilder implements ServiceFileBuilder {
                         .addStatement("$L.writeTo($L.getFiler())", "file", PROCESSING_ENV_NAME)
                         .endControlFlow()
                         .beginControlFlow("catch ($T e)", FILER_EXCEPTION_CLASS_NAME)
-                        .addStatement(
-                                "throw new $T($S + $L.getMessage())",
-                                EZ_SERVICE_EXCEPTION_CLASS_NAME, "Couldn't create file: ", "e")
+                        .addComment("Already exists ...")
                         .endControlFlow()
                         .beginControlFlow("catch ($T e)", IOException.class)
                         .addStatement("throw new $T($L)", RuntimeException.class, "e")
                         .endControlFlow()
                         .build();
 
+        MethodSpec.Builder processBuilder =
+                PoetUtil.publicFinalMethod("process", TypeName.BOOLEAN)
+                        .addParameter(SET_WILD_EXTENDS_ELE, PROCESS_METHOD_ARG_SET_NAME)
+                        .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME);
+
+        String markerAnnotationName =
+                MarkerAnnotation.addMarkerAnnotationInstance(processBuilder, annotation, procEnv.getTypeUtils());
+
         MethodSpec processAnnotatedElement =
                 PoetUtil.privateMethod(PROCESS_ANNOTATED_ELEMENT_METHOD_NAME, TypeName.VOID)
                         .addParameter(ELEMENT_CLASS_NAME, PROCESS_ANNOTATED_ELEMENT_ELEMENT_ARG_NAME)
                         .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME)
-                        .addStatement("$T allFiles = $T.buildServiceFiles($L, $L, $L)",
+                        .addParameter(MARKER_ANNOTATION_CLASS_NAME, "marker")
+                        .addStatement("$T allFiles = $T.buildSpecializedServiceFiles($L, $L, $L, $L)",
                                 LIST_JAVA_FILE_NAME,
                                 COMPLETE_SERVICE_BUILDER_CLASS_NAME,
                                 PROCESS_ANNOTATED_ELEMENT_ELEMENT_ARG_NAME,
+                                markerAnnotationName,
                                 ROUND_ENV_NAME,
                                 PROCESSING_ENV_NAME)
                         .beginControlFlow("for ($T file : $L)", JAVA_FILE_CLASS_NAME, "allFiles")
@@ -54,20 +63,12 @@ public class ServiceAnnotationProcessorBuilder implements ServiceFileBuilder {
                         .build();
 
 
+
         MethodSpec process =
-                PoetUtil.publicFinalMethod("process", TypeName.BOOLEAN)
-                        .addParameter(SET_WILD_EXTENDS_ELE, PROCESS_METHOD_ARG_SET_NAME)
-                        .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME)
-                        .beginControlFlow("try")
+                processBuilder.beginControlFlow("try")
                         .beginControlFlow("for ($T annotation : $L)", TYPE_ELEMENT_CLASS_NAME, PROCESS_METHOD_ARG_SET_NAME)
                         .addComment("We have to create source files for any annotated elements.")
-                        .beginControlFlow(
-                                "for ($T annotatedEle : $L.getElementsAnnotatedWith($L))",
-                                ELEMENT_CLASS_NAME,
-                                ROUND_ENV_NAME,
-                                "annotation")
-                        .addStatement("$N($L, $L)", processAnnotatedElement, "annotatedEle", ROUND_ENV_NAME)
-                        .endControlFlow()
+                        .addStatement("$N($L, $L, $L)", processAnnotatedElement, "annotation", ROUND_ENV_NAME, markerAnnotationName)
                         .endControlFlow()
                         .endControlFlow()
                         .beginControlFlow("catch ($T e)", EZ_SERVICE_EXCEPTION_CLASS_NAME)
@@ -85,7 +86,7 @@ public class ServiceAnnotationProcessorBuilder implements ServiceFileBuilder {
                         .build();
 
         TypeSpec procSpec =
-                TypeSpec.classBuilder(annotation.getServiceName()+"Processor")
+                TypeSpec.classBuilder(annotation.getServiceName() + "Processor")
                         .superclass(ABSTRACT_PROCESSOR_CLASS_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                         .addAnnotation(
@@ -96,16 +97,21 @@ public class ServiceAnnotationProcessorBuilder implements ServiceFileBuilder {
                                 AnnotationSpec.builder(SUPPORTED_SOURCE_VERSION_CLASS_NAME)
                                         .addMember("value", "$T.RELEASE_8", SOURCE_VERSION_CLASS_NAME)
                                         .build())
-                        .addAnnotation(
-                                AnnotationSpec.builder(AUTO_SERVICE_CLASS_NAME)
-                                        .addMember("value", "$T.class", PROCESSOR_CLASS_NAME)
-                                        .build())
+//                        .addAnnotation(
+//                                AnnotationSpec.builder(AUTO_SERVICE_CLASS_NAME)
+//                                        .addMember("value", "$T.class", PROCESSOR_CLASS_NAME)
+//                                        .build())
                         .addMethod(process)
                         .addMethod(processAnnotatedElement)
                         .addMethod(writeFile)
                         .build();
+        String currentPackage = this.getClass().getPackage().getName();
+        String processorQName = currentPackage + "." + annotation.getServiceName() + "Processor";
 
-        return ImmutableList.of(JavaFile.builder(annotation.getOutputPackage(), procSpec).build());
+        // Write the META-INF service file for the new processor.
+        overallBuilder.addToSpiOutput(Processor.class.getName(), Collections.singleton(processorQName));
+
+        return ImmutableList.of(JavaFile.builder(currentPackage, procSpec).build());
 
     }
 }
