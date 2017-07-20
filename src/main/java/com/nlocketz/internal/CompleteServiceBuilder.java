@@ -15,8 +15,8 @@ public final class CompleteServiceBuilder  {
         return Arrays.asList(
                 new ServiceProviderInterfaceFileBuilder(this),
                 new ServiceRegistryFileBuilder(this),
-                new ServiceProviderFileBuilder(this),
-                new ServiceAnnotationProcessorBuilder(this)
+                new ServiceProviderFileBuilder(this)
+                //new ServiceAnnotationProcessorBuilder(this)
         );
     }
 

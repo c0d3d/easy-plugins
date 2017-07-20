@@ -97,10 +97,6 @@ public class ServiceAnnotationProcessorBuilder extends AbstractServiceFileBuilde
                                 AnnotationSpec.builder(SUPPORTED_SOURCE_VERSION_CLASS_NAME)
                                         .addMember("value", "$T.RELEASE_8", SOURCE_VERSION_CLASS_NAME)
                                         .build())
-//                        .addAnnotation(
-//                                AnnotationSpec.builder(AUTO_SERVICE_CLASS_NAME)
-//                                        .addMember("value", "$T.class", PROCESSOR_CLASS_NAME)
-//                                        .build())
                         .addMethod(process)
                         .addMethod(processAnnotatedElement)
                         .addMethod(writeFile)

@@ -62,10 +62,6 @@ public class ServiceProviderFileBuilder extends AbstractServiceFileBuilder {
         marked.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
 
         TypeSpec clazz = TypeSpec.classBuilder(className)
-//                .addAnnotation(
-//                        AnnotationSpec.builder(AutoService.class)
-//                                .addMember("value", "$L.class", interfaceName)
-//                                .build())
                 .addSuperinterface(ClassName.get(outputPkg, interfaceName))
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
