@@ -4,16 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.nlocketz.annotation</groupId>
-    <artifactId>easyservice</artifactId>
+    <groupId>com.nlocketz.plugins</groupId>
+    <artifactId>easy-plugins</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <properties>
-        <auto-service.version>1.0-rc3</auto-service.version>
-        <javapoet.version>1.9.0</javapoet.version>
-        <maven-invoker-plugin.version>3.0.0</maven-invoker-plugin.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>easy-plugins</name>
+    <url>https://github.com/c0d3d/EZServiceProvider</url>
+    <description>Annotation directed service providers, made easy!</description>
 
     <developers>
         <developer>
@@ -28,6 +25,13 @@
             <url>https://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
+
+    <properties>
+        <auto-service.version>1.0-rc3</auto-service.version>
+        <javapoet.version>1.9.0</javapoet.version>
+        <maven-invoker-plugin.version>3.0.0</maven-invoker-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <scm>
         <url>git@github.com:c0d3d/EZServiceProvider.git</url>
