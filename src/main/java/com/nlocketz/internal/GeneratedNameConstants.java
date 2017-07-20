@@ -1,6 +1,5 @@
 package com.nlocketz.internal;
 
-import com.google.auto.service.AutoService;
 import com.nlocketz.EZServiceException;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -47,7 +46,6 @@ final class GeneratedNameConstants {
     static final ClassName SUPPORTED_ANNOTATION_TYPES_CLASS_NAME = ClassName.get(SupportedAnnotationTypes.class);
     static final ClassName SUPPORTED_SOURCE_VERSION_CLASS_NAME = ClassName.get(SupportedSourceVersion.class);
     static final ClassName SOURCE_VERSION_CLASS_NAME = ClassName.get(SourceVersion.class);
-    static final ClassName AUTO_SERVICE_CLASS_NAME = ClassName.get(AutoService.class);
     static final ClassName PROCESSOR_CLASS_NAME = ClassName.get(Processor.class);
     static final ClassName FILER_EXCEPTION_CLASS_NAME = ClassName.get(FilerException.class);
     static final ClassName MARKER_ANNOTATION_CLASS_NAME = ClassName.get(MarkerAnnotation.class);

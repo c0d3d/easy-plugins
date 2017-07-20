@@ -1,6 +1,5 @@
 package com.nlocketz.internal;
 
-import com.google.common.collect.ImmutableList;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.*;
@@ -107,7 +106,7 @@ public class ServiceAnnotationProcessorBuilder extends AbstractServiceFileBuilde
         // Write the META-INF service file for the new processor.
         overallBuilder.addToSpiOutput(Processor.class.getName(), Collections.singleton(processorQName));
 
-        return ImmutableList.of(JavaFile.builder(currentPackage, procSpec).build());
+        return Collections.singletonList(JavaFile.builder(currentPackage, procSpec).build());
 
     }
 }
