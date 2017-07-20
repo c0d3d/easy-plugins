@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.nlocketz.plugins</groupId>
     <artifactId>easy-plugins</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <name>easy-plugins</name>
     <url>https://github.com/c0d3d/EZServiceProvider</url>
@@ -37,7 +35,7 @@
         <url>git@github.com:c0d3d/EZServiceProvider.git</url>
         <connection>scm:git:git://github.com/c0d3d/EZServiceProvider.git</connection>
         <developerConnection>scm:git:git@github.com:c0d3d/EZServiceProvider.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>easy-plugins-0.0.1</tag>
     </scm>
 
     <distributionManagement>
