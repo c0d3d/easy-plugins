@@ -1,6 +1,6 @@
 package com.nlocketz.internal;
 
-import com.nlocketz.EZServiceException;
+import com.nlocketz.EasyPluginException;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -39,9 +39,9 @@ final class GeneratedNameConstants {
     /* Class names used */
     static final ClassName TYPE_ELEMENT_CLASS_NAME = ClassName.get(TypeElement.class);
     static final ClassName ELEMENT_CLASS_NAME = ClassName.get(Element.class);
-    static final ClassName EZ_SERVICE_EXCEPTION_CLASS_NAME = ClassName.get(EZServiceException.class);
+    static final ClassName EZ_SERVICE_EXCEPTION_CLASS_NAME = ClassName.get(EasyPluginException.class);
     static final ClassName ROUND_ENV_CLASS_NAME = ClassName.get(RoundEnvironment.class);
-    static final ClassName COMPLETE_SERVICE_BUILDER_CLASS_NAME = ClassName.get(CompleteServiceGenerator.class);
+    static final ClassName COMPLETE_SERVICE_BUILDER_CLASS_NAME = ClassName.get(CompletePluginGenerator.class);
     static final ClassName JAVA_FILE_CLASS_NAME = ClassName.get(JavaFile.class);
     static final ClassName ABSTRACT_PROCESSOR_CLASS_NAME = ClassName.get(AbstractProcessor.class);
     static final ClassName SUPPORTED_ANNOTATION_TYPES_CLASS_NAME = ClassName.get(SupportedAnnotationTypes.class);
@@ -59,7 +59,7 @@ final class GeneratedNameConstants {
     static final ParameterizedTypeName LIST_JAVA_FILE_NAME =
             ParameterizedTypeName.get(LIST_CLASS_NAME, JAVA_FILE_CLASS_NAME);
     static final ParameterizedTypeName SET_WILD_EXTENDS_ELE =
-            ParameterizedTypeName.get(SET_CLASS_NAME, PoetUtil.wildcardType(TYPE_ELEMENT_CLASS_NAME));
+            ParameterizedTypeName.get(SET_CLASS_NAME, Util.wildcardType(TYPE_ELEMENT_CLASS_NAME));
 
     /* All names of methods */
     static final String GET_NAME_METHOD_NAME = "getProviderName";

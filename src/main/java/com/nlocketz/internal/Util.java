@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-final class PoetUtil {
-    private PoetUtil() {
+final class Util {
+    private Util() {
 
     }
 
@@ -105,8 +105,6 @@ final class PoetUtil {
                     writer.append("\n");
                 }
             }
-        } catch (FilerException e) {
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

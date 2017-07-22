@@ -1,10 +1,9 @@
 package com.nlocketz.internal;
 
-import com.nlocketz.EZServiceException;
+import com.nlocketz.EasyPluginException;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import javax.lang.model.util.Elements;
@@ -13,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-class MarkedServiceClass {
+class MarkedPluginClass {
 
     private TypeElement clazzElement;
 
@@ -29,10 +28,10 @@ class MarkedServiceClass {
 
     private String serviceName;
 
-    MarkedServiceClass(TypeElement clazzElement,
-                       String serviceName,
-                       Types types,
-                       Elements elements) {
+    MarkedPluginClass(TypeElement clazzElement,
+                      String serviceName,
+                      Types types,
+                      Elements elements) {
 
         this.clazzElement = clazzElement;
         MutBool defaultConst = new MutBool();
@@ -40,7 +39,7 @@ class MarkedServiceClass {
         computeConstructors(clazzElement, defaultConst, mapConst, types, elements);
 
         if (!defaultConst.val && !mapConst.val) {
-            throw new EZServiceException(
+            throw new EasyPluginException(
                     "Services must have either a default constructor, or one taking in java.util.Map<String,String>");
         }
 

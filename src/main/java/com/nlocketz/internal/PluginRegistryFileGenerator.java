@@ -5,9 +5,6 @@ import com.squareup.javapoet.*;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import static com.nlocketz.internal.GeneratedNameConstants.MAP_STRING_STRING_NAME;
@@ -17,10 +14,10 @@ import static com.nlocketz.internal.GeneratedNameConstants.SERVICE_LOADER_CLASS_
  * Builds the "registry" for a service.
  * The registry is the class that you can query for different service providers, and construct them.
  */
-class ServiceRegistryFileGenerator extends AbstractServiceFileGenerator {
+class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
 
 
-    protected ServiceRegistryFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
+    protected PluginRegistryFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
         super(procEnv, roundEnv);
     }
 
@@ -34,9 +31,9 @@ class ServiceRegistryFileGenerator extends AbstractServiceFileGenerator {
         TypeSpec classSpec = TypeSpec.classBuilder(registryClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(
-                        PoetUtil.privateStaticField(registryName, GeneratedNameConstants.INSTANCE_FIELD_NAME).build())
+                        Util.privateStaticField(registryName, GeneratedNameConstants.INSTANCE_FIELD_NAME).build())
                 .addField(
-                        PoetUtil.privateField(genericServiceLoaderName, GeneratedNameConstants.SERVICE_LOADER_FIELD_NAME).build())
+                        Util.privateField(genericServiceLoaderName, GeneratedNameConstants.SERVICE_LOADER_FIELD_NAME).build())
                 .addMethod(
                         MethodSpec.methodBuilder("getInstance")
                                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)

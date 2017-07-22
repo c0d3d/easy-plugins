@@ -2,7 +2,7 @@ package com.nlocketz;
 
 
 import com.google.auto.service.AutoService;
-import com.nlocketz.internal.CompleteServiceGenerator;
+import com.nlocketz.internal.CompletePluginGenerator;
 import com.nlocketz.internal.ProcessorOutputCollection;
 
 import javax.annotation.processing.*;
@@ -16,7 +16,7 @@ import java.util.Set;
 @SupportedAnnotationTypes("com.nlocketz.Service")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @AutoService(Processor.class)
-public final class EasyServiceProcessor extends AbstractProcessor {
+public final class EasyPluginProcessor extends AbstractProcessor {
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
 
@@ -29,8 +29,8 @@ public final class EasyServiceProcessor extends AbstractProcessor {
                     processService(newService, roundEnvironment, output);
                 }
             }
-        } catch (EZServiceException e) {
-            // See comment on EZServiceException
+        } catch (EasyPluginException e) {
+            // See comment on EasyPluginException
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         } catch (Exception e) {
             // Everything else is a problem ...
@@ -53,6 +53,6 @@ public final class EasyServiceProcessor extends AbstractProcessor {
     private void processService(Element annotationElement,
                                 RoundEnvironment roundEnv,
                                 ProcessorOutputCollection output) {
-        CompleteServiceGenerator.buildServiceFiles(annotationElement, roundEnv, processingEnv, output);
+        CompletePluginGenerator.buildServiceFiles(annotationElement, roundEnv, processingEnv, output);
     }
 }

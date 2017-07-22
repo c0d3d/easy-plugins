@@ -10,17 +10,17 @@ import java.util.Collections;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
 
-public class ServiceAnnotationProcessorGenerator extends AbstractServiceFileGenerator {
+public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenerator {
 
-    protected ServiceAnnotationProcessorGenerator(ProcessingEnvironment procEnv,
-                                                  RoundEnvironment roundEnv) {
+    protected PluginAnnotationProcessorGenerator(ProcessingEnvironment procEnv,
+                                                 RoundEnvironment roundEnv) {
         super(procEnv, roundEnv);
     }
 
     @Override
     public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
         MethodSpec writeFile =
-                PoetUtil.privateMethod(WRITE_FILE_METHOD_NAME, TypeName.VOID)
+                Util.privateMethod(WRITE_FILE_METHOD_NAME, TypeName.VOID)
                         .addParameter(JAVA_FILE_CLASS_NAME, "file")
                         .beginControlFlow("try")
                         .addStatement("$L.writeTo($L.getFiler())", "file", PROCESSING_ENV_NAME)
@@ -34,7 +34,7 @@ public class ServiceAnnotationProcessorGenerator extends AbstractServiceFileGene
                         .build();
 
         MethodSpec.Builder processBuilder =
-                PoetUtil.publicFinalMethod("process", TypeName.BOOLEAN)
+                Util.publicFinalMethod("process", TypeName.BOOLEAN)
                         .addParameter(SET_WILD_EXTENDS_ELE, PROCESS_METHOD_ARG_SET_NAME)
                         .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME);
 
@@ -42,7 +42,7 @@ public class ServiceAnnotationProcessorGenerator extends AbstractServiceFileGene
                 MarkerAnnotation.addMarkerAnnotationInstance(processBuilder, marker, types);
 
         MethodSpec processAnnotatedElement =
-                PoetUtil.privateMethod(PROCESS_ANNOTATED_ELEMENT_METHOD_NAME, TypeName.VOID)
+                Util.privateMethod(PROCESS_ANNOTATED_ELEMENT_METHOD_NAME, TypeName.VOID)
                         .addParameter(ELEMENT_CLASS_NAME, PROCESS_ANNOTATED_ELEMENT_ELEMENT_ARG_NAME)
                         .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME)
                         .addParameter(MARKER_ANNOTATION_CLASS_NAME, "marker")

@@ -1,6 +1,6 @@
 package com.nlocketz.internal;
 
-public interface ServiceFileGenerator {
+public interface PluginFileGenerator {
     void generate(UserMarkerAnnotation marker,
                   ProcessorOutputCollection into);
 }

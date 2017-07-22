@@ -6,25 +6,25 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.util.*;
 
-public final class CompleteServiceGenerator {
+public final class CompletePluginGenerator {
 
     /**
-     * Builds a new pipeline of {@link ServiceFileGenerator}s.
+     * Builds a new pipeline of {@link PluginFileGenerator}s.
      * @param procEnv The current processing environment.
      * @param roundEnv The current round environment.
      * @return The newly built pipeline.
      */
-    private static List<ServiceFileGenerator> generatorList(ProcessingEnvironment procEnv,
-                                                            RoundEnvironment roundEnv) {
+    private static List<PluginFileGenerator> generatorList(ProcessingEnvironment procEnv,
+                                                           RoundEnvironment roundEnv) {
         return Arrays.asList(
-                new ServiceProviderInterfaceFileGenerator(procEnv, roundEnv),
-                new ServiceProviderFileGenerator(procEnv, roundEnv),
-                new ServiceRegistryFileGenerator(procEnv, roundEnv)//,
-                //new ServiceAnnotationProcessorGenerator(procEnv, roundEnv)
+                new PluginProviderInterfaceFileGenerator(procEnv, roundEnv),
+                new PluginProviderFileGenerator(procEnv, roundEnv),
+                new PluginRegistryFileGenerator(procEnv, roundEnv)//,
+                //new PluginAnnotationProcessorGenerator(procEnv, roundEnv)
         );
     }
 
-    private CompleteServiceGenerator() {
+    private CompletePluginGenerator() {
 
     }
 
@@ -34,7 +34,7 @@ public final class CompleteServiceGenerator {
             RoundEnvironment roundEnv,
             ProcessorOutputCollection output) {
 
-        for (ServiceFileGenerator subGen : generatorList(procEnv, roundEnv)) {
+        for (PluginFileGenerator subGen : generatorList(procEnv, roundEnv)) {
             subGen.generate(annotation, output);
         }
 
@@ -54,7 +54,7 @@ public final class CompleteServiceGenerator {
                                                    ProcessingEnvironment procEnv,
                                                    ProcessorOutputCollection output) {
         buildServiceFilesInternal(
-                ServiceAnnotation.createUserMarker(annotationElement, procEnv), roundEnv, procEnv, output);
+                PluginAnnotation.createUserMarker(annotationElement, procEnv), roundEnv, procEnv, output);
 
 
     }

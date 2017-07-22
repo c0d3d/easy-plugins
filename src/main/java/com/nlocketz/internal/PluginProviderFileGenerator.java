@@ -8,20 +8,20 @@ import javax.lang.model.element.Modifier;
 import java.util.Collections;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
-import static com.nlocketz.internal.PoetUtil.publicFinalMethod;
+import static com.nlocketz.internal.Util.publicFinalMethod;
 
 /**
  * Builds the service providers for our internal service
- * (the one created by {@link ServiceProviderInterfaceFileGenerator}). //TODO
- * There will be one provider for every {@link MarkedServiceClass} within a given {@link ServiceAnnotation}.
+ * (the one created by {@link PluginProviderInterfaceFileGenerator}). //TODO
+ * There will be one provider for every {@link MarkedPluginClass} within a given {@link PluginAnnotation}.
  */
-class ServiceProviderFileGenerator extends AbstractServiceFileGenerator {
+class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
 
-    protected ServiceProviderFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
+    protected PluginProviderFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
         super(procEnv, roundEnv);
     }
 
-    private void buildSingleMarkedClass(MarkedServiceClass marked,
+    private void buildSingleMarkedClass(MarkedPluginClass marked,
                                         String interfaceName,
                                         String outputPkg,
                                         ProcessorOutputCollection into) {
@@ -55,7 +55,7 @@ class ServiceProviderFileGenerator extends AbstractServiceFileGenerator {
 
     @Override
     public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
-        for (MarkedServiceClass marked : marker.getMarkedClasses(roundEnv, types, elements)) {
+        for (MarkedPluginClass marked : marker.getMarkedClasses(roundEnv, types, elements)) {
             buildSingleMarkedClass(
                     marked,
                     marker.getServiceInterfaceProviderName(),

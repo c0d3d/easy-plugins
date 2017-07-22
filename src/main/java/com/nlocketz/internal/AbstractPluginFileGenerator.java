@@ -8,7 +8,7 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.util.Map;
 
-abstract class AbstractServiceFileGenerator implements ServiceFileGenerator {
+abstract class AbstractPluginFileGenerator implements PluginFileGenerator {
     protected Types types;
     protected Elements elements;
     protected RoundEnvironment roundEnv;
@@ -16,7 +16,7 @@ abstract class AbstractServiceFileGenerator implements ServiceFileGenerator {
 
     private Messager msgr;
 
-    protected AbstractServiceFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
+    protected AbstractPluginFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
         this.types = procEnv.getTypeUtils();
         this.elements = procEnv.getElementUtils();
         this.roundEnv = roundEnv;

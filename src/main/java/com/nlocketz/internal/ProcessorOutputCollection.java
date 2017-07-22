@@ -1,6 +1,6 @@
 package com.nlocketz.internal;
 
-import com.nlocketz.EZServiceException;
+import com.nlocketz.EasyPluginException;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -24,7 +24,7 @@ public class ProcessorOutputCollection {
 
             if (map.get(key).contains(value) && msg != null) {
                 // Prevent duplicate creations
-                throw new EZServiceException(msg + value.toString());
+                throw new EasyPluginException(msg + value.toString());
             }
 
             map.get(key).add(value);
@@ -75,7 +75,7 @@ public class ProcessorOutputCollection {
         }
 
         for (Map.Entry<String, Set<String>> service : serviceProviders.entrySet()) {
-            PoetUtil.writeMetaInfServices(service.getKey(), service.getValue(), filer);
+            Util.writeMetaInfServices(service.getKey(), service.getValue(), filer);
         }
     }
 
@@ -84,7 +84,7 @@ public class ProcessorOutputCollection {
         try {
             file.writeTo(filer);
         } catch (FilerException e) {
-            throw new EZServiceException("Couldn't create file: "+e.getMessage());
+            throw new EasyPluginException("Couldn't create file: "+e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
