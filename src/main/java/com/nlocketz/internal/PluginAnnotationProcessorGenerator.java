@@ -19,19 +19,6 @@ public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenera
 
     @Override
     public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
-        MethodSpec writeFile =
-                Util.privateMethod(WRITE_FILE_METHOD_NAME, TypeName.VOID)
-                        .addParameter(JAVA_FILE_CLASS_NAME, "file")
-                        .beginControlFlow("try")
-                        .addStatement("$L.writeTo($L.getFiler())", "file", PROCESSING_ENV_NAME)
-                        .endControlFlow()
-                        .beginControlFlow("catch ($T e)", FILER_EXCEPTION_CLASS_NAME)
-                        .addComment("Already exists ...")
-                        .endControlFlow()
-                        .beginControlFlow("catch ($T e)", IOException.class)
-                        .addStatement("throw new $T($L)", RuntimeException.class, "e")
-                        .endControlFlow()
-                        .build();
 
         MethodSpec.Builder processBuilder =
                 Util.publicFinalMethod("process", TypeName.BOOLEAN)
@@ -46,25 +33,25 @@ public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenera
                         .addParameter(ELEMENT_CLASS_NAME, PROCESS_ANNOTATED_ELEMENT_ELEMENT_ARG_NAME)
                         .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME)
                         .addParameter(MARKER_ANNOTATION_CLASS_NAME, "marker")
-                        .addStatement("$T allFiles = $T.buildSpecializedServiceFiles($L, $L, $L, $L)",
-                                LIST_JAVA_FILE_NAME,
+                        .addParameter(PROC_OUT_COLL_CLASS_NAME, "out")
+                        .addStatement("$T.buildSpecializedServiceFiles($L, $L, $L, $L, $L)",
                                 COMPLETE_SERVICE_BUILDER_CLASS_NAME,
                                 PROCESS_ANNOTATED_ELEMENT_ELEMENT_ARG_NAME,
                                 markerAnnotationName,
                                 ROUND_ENV_NAME,
-                                PROCESSING_ENV_NAME)
-                        .beginControlFlow("for ($T file : $L)", JAVA_FILE_CLASS_NAME, "allFiles")
-                        .addStatement("$N(file)", writeFile)
-                        .endControlFlow()
+                                PROCESSING_ENV_NAME,
+                                "out")
                         .build();
 
 
 
         MethodSpec process =
-                processBuilder.beginControlFlow("try")
+                processBuilder
+                        .addStatement("$T $L = $T.empty()", PROC_OUT_COLL_CLASS_NAME, "out", PROC_OUT_COLL_CLASS_NAME)
+                        .beginControlFlow("try")
                         .beginControlFlow("for ($T annotation : $L)", TYPE_ELEMENT_CLASS_NAME, PROCESS_METHOD_ARG_SET_NAME)
                         .addComment("We have to create source files for any annotated elements.")
-                        .addStatement("$N($L, $L, $L)", processAnnotatedElement, "annotation", ROUND_ENV_NAME, markerAnnotationName)
+                        .addStatement("$N($L, $L, $L, $L)", processAnnotatedElement, "annotation", ROUND_ENV_NAME, markerAnnotationName, "out")
                         .endControlFlow()
                         .endControlFlow()
                         .beginControlFlow("catch ($T e)", EZ_SERVICE_EXCEPTION_CLASS_NAME)
@@ -77,6 +64,7 @@ public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenera
                         .addStatement("$L.printStackTrace()", "e")
                         .addStatement("throw new $T($L)", RuntimeException.class, "e")
                         .endControlFlow()
+                        .addStatement("$L.writeContents($L.getFiler())", "out", PROCESSING_ENV_NAME)
                         .addComment("Done ...")
                         .addStatement("return false")
                         .build();
@@ -95,10 +83,8 @@ public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenera
                                         .build())
                         .addMethod(process)
                         .addMethod(processAnnotatedElement)
-                        .addMethod(writeFile)
                         .build();
         String currentPackage = this.getClass().getPackage().getName();
-        String processorQName = currentPackage + "." + marker.getProcessorServiceName();
 
         // Put the new type into the output.
         // It provides a service for the Processor class

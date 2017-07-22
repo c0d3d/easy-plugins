@@ -51,6 +51,7 @@ final class GeneratedNameConstants {
     static final ClassName FILER_EXCEPTION_CLASS_NAME = ClassName.get(FilerException.class);
     static final ClassName MARKER_ANNOTATION_CLASS_NAME = ClassName.get(MarkerAnnotation.class);
     static final ClassName SERVICE_LOADER_CLASS_NAME = ClassName.get(ServiceLoader.class);
+    static final ClassName PROC_OUT_COLL_CLASS_NAME = ClassName.get(ProcessorOutputCollection.class);
 
     /* Type names */
     static final TypeName STRING_TYPE_NAME = TypeName.get(String.class);

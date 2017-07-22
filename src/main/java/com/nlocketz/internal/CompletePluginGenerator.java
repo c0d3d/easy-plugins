@@ -19,8 +19,8 @@ public final class CompletePluginGenerator {
         return Arrays.asList(
                 new PluginProviderInterfaceFileGenerator(procEnv, roundEnv),
                 new PluginProviderFileGenerator(procEnv, roundEnv),
-                new PluginRegistryFileGenerator(procEnv, roundEnv)//,
-                //new PluginAnnotationProcessorGenerator(procEnv, roundEnv)
+                new PluginRegistryFileGenerator(procEnv, roundEnv),
+                new PluginAnnotationProcessorGenerator(procEnv, roundEnv)
         );
     }
 
