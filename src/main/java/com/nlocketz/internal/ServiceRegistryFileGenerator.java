@@ -10,26 +10,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import static com.nlocketz.internal.GeneratedNameConstants.MAP_STRING_STRING_NAME;
+import static com.nlocketz.internal.GeneratedNameConstants.SERVICE_LOADER_CLASS_NAME;
+
 /**
  * Builds the "registry" for a service.
  * The registry is the class that you can query for different service providers, and construct them.
  */
-class ServiceRegistryFileBuilder extends AbstractServiceFileBuilder {
+class ServiceRegistryFileGenerator extends AbstractServiceFileGenerator {
 
-    ServiceRegistryFileBuilder(CompleteServiceBuilder overallBuilder) {
-        super(overallBuilder);
+
+    protected ServiceRegistryFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
+        super(procEnv, roundEnv);
     }
 
     @Override
-    public List<JavaFile> buildFiles(ServiceAnnotation annotation, RoundEnvironment roundEnv, ProcessingEnvironment procEnv) {
-        String registryClassName = annotation.getServiceRegistryName();
-        ClassName spiName = ClassName.get(annotation.getOutputPackage(), annotation.getServiceInterfaceName());
-        ClassName registryName = ClassName.get(annotation.getOutputPackage(), registryClassName);
-        ClassName serviceLoaderName = ClassName.get(ServiceLoader.class);
-        ClassName mapClassName = ClassName.get(Map.class);
-        ClassName stringClassName = ClassName.get(String.class);
-        ParameterizedTypeName genericServiceLoaderName = ParameterizedTypeName.get(serviceLoaderName, spiName);
-        ParameterizedTypeName genericMap = ParameterizedTypeName.get(mapClassName, stringClassName, stringClassName);
+    public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
+        String registryClassName = marker.getRegistryServiceName();
+        ClassName spiName = ClassName.get(marker.getOutputPackage(), marker.getServiceInterfaceProviderName());
+        ClassName registryName = ClassName.get(marker.getOutputPackage(), registryClassName);
+        ParameterizedTypeName genericServiceLoaderName = ParameterizedTypeName.get(SERVICE_LOADER_CLASS_NAME, spiName);
 
         TypeSpec classSpec = TypeSpec.classBuilder(registryClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
@@ -55,8 +55,8 @@ class ServiceRegistryFileBuilder extends AbstractServiceFileBuilder {
                                         spiName)
                                 .build())
                 .addMethod(
-                        MethodSpec.methodBuilder("get"+annotation.getServiceName()+"ByName")
-                                .returns(annotation.getProviderReturnTypeName())
+                        MethodSpec.methodBuilder("get"+marker.getServiceInterfaceName()+"ByName")
+                                .returns(marker.getServiceInterfaceTypeName())
                                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                                 .addParameter(String.class, GeneratedNameConstants.PROVIDER_NAME_ARG_NAME)
                                 .beginControlFlow("for ($T s : getInstance().$L)", spiName, GeneratedNameConstants.SERVICE_LOADER_FIELD_NAME)
@@ -66,11 +66,11 @@ class ServiceRegistryFileBuilder extends AbstractServiceFileBuilder {
                                 .endControlFlow()
                                 .addStatement("return null").build())
                 .addMethod(
-                        MethodSpec.methodBuilder("get"+annotation.getServiceName()+"ByNameWithConfig")
-                                .returns(annotation.getProviderReturnTypeName())
+                        MethodSpec.methodBuilder("get"+marker.getServiceInterfaceName()+"ByNameWithConfig")
+                                .returns(marker.getServiceInterfaceTypeName())
                                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                                 .addParameter(String.class, GeneratedNameConstants.PROVIDER_NAME_ARG_NAME)
-                                .addParameter(genericMap, GeneratedNameConstants.CONFIG_ARG_NAME)
+                                .addParameter(MAP_STRING_STRING_NAME, GeneratedNameConstants.CONFIG_ARG_NAME)
                                 .beginControlFlow("for ($T s : getInstance().$L)", spiName, GeneratedNameConstants.SERVICE_LOADER_FIELD_NAME)
                                 .beginControlFlow("if (s.getProviderName().equals($L))", GeneratedNameConstants.PROVIDER_NAME_ARG_NAME)
                                 .addStatement("return s.createWithConfig($L)", GeneratedNameConstants.CONFIG_NAME_ARG_NAME)
@@ -79,7 +79,6 @@ class ServiceRegistryFileBuilder extends AbstractServiceFileBuilder {
                                 .addStatement("return null").build())
                 .build();
 
-        return Collections.singletonList(
-                JavaFile.builder(annotation.getOutputPackage(), classSpec).build());
+        into.putType(marker.getOutputPackage(), classSpec);
     }
 }

@@ -7,21 +7,18 @@ import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
 
-public class ServiceAnnotationProcessorBuilder extends AbstractServiceFileBuilder {
+public class ServiceAnnotationProcessorGenerator extends AbstractServiceFileGenerator {
 
-    ServiceAnnotationProcessorBuilder(CompleteServiceBuilder overallBuilder) {
-        super(overallBuilder);
+    protected ServiceAnnotationProcessorGenerator(ProcessingEnvironment procEnv,
+                                                  RoundEnvironment roundEnv) {
+        super(procEnv, roundEnv);
     }
 
     @Override
-    public List<JavaFile> buildFiles(ServiceAnnotation annotation,
-                                     RoundEnvironment roundEnv,
-                                     ProcessingEnvironment procEnv) {
-
+    public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
         MethodSpec writeFile =
                 PoetUtil.privateMethod(WRITE_FILE_METHOD_NAME, TypeName.VOID)
                         .addParameter(JAVA_FILE_CLASS_NAME, "file")
@@ -42,7 +39,7 @@ public class ServiceAnnotationProcessorBuilder extends AbstractServiceFileBuilde
                         .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME);
 
         String markerAnnotationName =
-                MarkerAnnotation.addMarkerAnnotationInstance(processBuilder, annotation, procEnv.getTypeUtils());
+                MarkerAnnotation.addMarkerAnnotationInstance(processBuilder, marker, types);
 
         MethodSpec processAnnotatedElement =
                 PoetUtil.privateMethod(PROCESS_ANNOTATED_ELEMENT_METHOD_NAME, TypeName.VOID)
@@ -85,12 +82,12 @@ public class ServiceAnnotationProcessorBuilder extends AbstractServiceFileBuilde
                         .build();
 
         TypeSpec procSpec =
-                TypeSpec.classBuilder(annotation.getServiceName() + "Processor")
+                TypeSpec.classBuilder(marker.getProcessorServiceName() + "Processor")
                         .superclass(ABSTRACT_PROCESSOR_CLASS_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                         .addAnnotation(
                                 AnnotationSpec.builder(SUPPORTED_ANNOTATION_TYPES_CLASS_NAME)
-                                        .addMember("value", "$S", annotation.getMirrorForMarkerAnnotation().toString())
+                                        .addMember("value", "$S", marker.getMarkerAnnotationType())
                                         .build())
                         .addAnnotation(
                                 AnnotationSpec.builder(SUPPORTED_SOURCE_VERSION_CLASS_NAME)
@@ -101,12 +98,11 @@ public class ServiceAnnotationProcessorBuilder extends AbstractServiceFileBuilde
                         .addMethod(writeFile)
                         .build();
         String currentPackage = this.getClass().getPackage().getName();
-        String processorQName = currentPackage + "." + annotation.getServiceName() + "Processor";
+        String processorQName = currentPackage + "." + marker.getProcessorServiceName();
 
-        // Write the META-INF service file for the new processor.
-        overallBuilder.addToSpiOutput(Processor.class.getName(), Collections.singleton(processorQName));
-
-        return Collections.singletonList(JavaFile.builder(currentPackage, procSpec).build());
+        // Put the new type into the output.
+        // It provides a service for the Processor class
+        into.putType(currentPackage, procSpec, Collections.singletonList(PROCESSOR_CLASS_NAME));
 
     }
 }

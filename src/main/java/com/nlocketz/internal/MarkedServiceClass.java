@@ -7,6 +7,8 @@ import com.squareup.javapoet.TypeName;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,14 +29,15 @@ class MarkedServiceClass {
 
     private String serviceName;
 
-    MarkedServiceClass(ProcessingEnvironment env,
-                              TypeElement clazzElement,
-                              String serviceName) {
+    MarkedServiceClass(TypeElement clazzElement,
+                       String serviceName,
+                       Types types,
+                       Elements elements) {
 
         this.clazzElement = clazzElement;
         MutBool defaultConst = new MutBool();
         MutBool mapConst = new MutBool();
-        computeConstructors(env, clazzElement, defaultConst, mapConst);
+        computeConstructors(clazzElement, defaultConst, mapConst, types, elements);
 
         if (!defaultConst.val && !mapConst.val) {
             throw new EZServiceException(
@@ -68,15 +71,17 @@ class MarkedServiceClass {
     /**
      * Discovers whether this marked service class has the default and map valued constructors
      * Assigns findings to the two mutable bools
-     * @param env Current processing environment
-     * @param clazzElement the typeelement corresponding to the class
-     * @param defaultConst the mutable boolean for the default constructor
-     * @param mapConst the mutable boolean for the map constructor.
+     * @param clazzElement The {@link TypeElement} corresponding to the class
+     * @param defaultConst The mutable boolean for the default constructor
+     * @param mapConst The mutable boolean for the map constructor.
+     * @param types The current type utils.
+     * @param elements The current element utils.
      */
-    private static void computeConstructors(ProcessingEnvironment env,
-                                            TypeElement clazzElement,
+    private static void computeConstructors(TypeElement clazzElement,
                                             MutBool defaultConst,
-                                            MutBool mapConst) {
+                                            MutBool mapConst,
+                                            Types types,
+                                            Elements elements) {
 
         for (Element e : clazzElement.getEnclosedElements()) {
             if (e.getKind() == ElementKind.CONSTRUCTOR) {
@@ -87,9 +92,9 @@ class MarkedServiceClass {
                 }
                 if (!mapConst.val && params.size() == 1) {
                     VariableElement ele = params.get(0);
-                    TypeMirror varType = env.getTypeUtils().erasure(ele.asType());
-                    TypeMirror m = env.getElementUtils().getTypeElement(Map.class.getCanonicalName()).asType();
-                    if (env.getTypeUtils().isAssignable(m, varType)) {
+                    TypeMirror varType = types.erasure(ele.asType());
+                    TypeMirror m = elements.getTypeElement(Map.class.getCanonicalName()).asType();
+                    if (types.isAssignable(m, varType)) {
                         mapConst.val = true;
                     }
                 }
@@ -130,6 +135,7 @@ class MarkedServiceClass {
         return serviceName;
     }
 
+    // TODO make sure nested classes work
     String getNewServiceClassName() {
         return clazzElement.getQualifiedName().toString().replace('.','$') + "$Service$" + serviceName.replace("\"", "");
     }

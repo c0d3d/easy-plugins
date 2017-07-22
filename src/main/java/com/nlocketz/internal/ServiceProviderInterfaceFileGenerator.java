@@ -11,18 +11,17 @@ import java.util.List;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
 
-public class ServiceProviderInterfaceFileBuilder extends AbstractServiceFileBuilder {
+public class ServiceProviderInterfaceFileGenerator extends AbstractServiceFileGenerator {
 
-    ServiceProviderInterfaceFileBuilder(CompleteServiceBuilder overallBuilder) {
-        super(overallBuilder);
+    protected ServiceProviderInterfaceFileGenerator(ProcessingEnvironment procEnv,
+                                                    RoundEnvironment roundEnv) {
+        super(procEnv, roundEnv);
     }
 
     @Override
-    public List<JavaFile> buildFiles(ServiceAnnotation annotation,
-                                     RoundEnvironment roundEnv,
-                                     ProcessingEnvironment procEnv) {
-        TypeName providerTypeName = annotation.getProviderReturnTypeName();
-        TypeSpec type = TypeSpec.interfaceBuilder(annotation.getServiceInterfaceName())
+    public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
+        TypeName providerTypeName = marker.getServiceInterfaceTypeName();
+        TypeSpec type = TypeSpec.interfaceBuilder(marker.getServiceInterfaceProviderName())
                 .addMethod(
                         PoetUtil.publicAbstractMethod(GET_NAME_METHOD_NAME, STRING_TYPE_NAME)
                                 .build())
@@ -35,7 +34,6 @@ public class ServiceProviderInterfaceFileBuilder extends AbstractServiceFileBuil
                                 .build())
                 .build();
 
-        return Collections.singletonList(
-                JavaFile.builder(annotation.getOutputPackage(), type).build());
+        into.putType(marker.getOutputPackage(), type);
     }
 }

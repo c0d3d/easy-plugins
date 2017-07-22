@@ -2,16 +2,14 @@ package com.nlocketz;
 
 
 import com.google.auto.service.AutoService;
-import com.nlocketz.internal.CompleteServiceBuilder;
-import com.squareup.javapoet.JavaFile;
+import com.nlocketz.internal.CompleteServiceGenerator;
+import com.nlocketz.internal.ProcessorOutputCollection;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
-import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 
@@ -22,11 +20,13 @@ public final class EasyServiceProcessor extends AbstractProcessor {
 
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
 
+        ProcessorOutputCollection output = ProcessorOutputCollection.empty();
+
         try {
             for (TypeElement ele : annotations) {
                 // For each annotated annotation we build and generate new source files.
                 for (Element newService : roundEnvironment.getElementsAnnotatedWith(ele)) {
-                    processService(newService, roundEnvironment);
+                    processService(newService, roundEnvironment, output);
                 }
             }
         } catch (EZServiceException e) {
@@ -38,9 +38,7 @@ public final class EasyServiceProcessor extends AbstractProcessor {
             throw new RuntimeException(e);
         }
 
-
-        CompleteServiceBuilder.writeSPIS(processingEnv.getFiler());
-
+        output.writeContents(processingEnv.getFiler());
 
         // We are done here ...
         return false;
@@ -52,23 +50,9 @@ public final class EasyServiceProcessor extends AbstractProcessor {
      * @param annotationElement The marked element.
      * @param roundEnv The current round environment.
      */
-    private void processService(Element annotationElement, RoundEnvironment roundEnv) {
-        // All the generated files for the marked annotation
-        List<JavaFile> allFiles =
-                CompleteServiceBuilder.buildServiceFiles(annotationElement, roundEnv, processingEnv);
-        for (JavaFile file : allFiles) {
-            writeFile(file);
-        }
-
-    }
-
-    private void writeFile(JavaFile file) {
-        try {
-            file.writeTo(processingEnv.getFiler());
-        } catch (FilerException e) {
-            throw new EZServiceException("Couldn't create file: "+e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private void processService(Element annotationElement,
+                                RoundEnvironment roundEnv,
+                                ProcessorOutputCollection output) {
+        CompleteServiceGenerator.buildServiceFiles(annotationElement, roundEnv, processingEnv, output);
     }
 }

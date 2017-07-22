@@ -43,18 +43,18 @@ class MarkerAnnotation {
      * @param annotation The service annotation to gather info from.
      * @return The name of the new instance.
      */
-    public static String addMarkerAnnotationInstance(MethodSpec.Builder builder, ServiceAnnotation annotation, Types types) {
+    public static String addMarkerAnnotationInstance(MethodSpec.Builder builder, UserMarkerAnnotation annotation, Types types) {
 
         String siName =
-                ((TypeElement)types.asElement(annotation.getProviderReturnTypeMirror())).getQualifiedName().toString();
+                ((TypeElement)types.asElement(annotation.getServiceInterfaceType())).getQualifiedName().toString();
         builder.addComment("The following values were gathered from the original @Service annotation parameters,");
         builder.addComment("and included here for this specialized service processor.");
         builder.addStatement("$T marker = new $T($S, $S, $S, $S)",
                 MARKER_ANNOTATION_CLASS_NAME,
                 MARKER_ANNOTATION_CLASS_NAME,
                 siName,
-                annotation.getServiceName(),
-                annotation.getServiceNameFromAnnotaion(),
+                annotation.getServiceInterfaceName(),
+                annotation.getIndividualNameKey(),
                 annotation.getOutputPackage());
 
         return "marker";

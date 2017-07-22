@@ -4,13 +4,19 @@ import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.FilerException;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 final class PoetUtil {
@@ -70,6 +76,10 @@ final class PoetUtil {
         return entries;
     }
 
+    static String packageNameFromQName(String s) {
+        return s.substring(0, s.lastIndexOf('.'));
+    }
+
     static void writeMetaInfServices(String spInterface, Set<String> processorQNames, Filer filer) {
         Set<String> content = new HashSet<>();
         String servicesFilePath = "META-INF/services/" + spInterface;
@@ -99,6 +109,38 @@ final class PoetUtil {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    static AnnotationMirror getMatchingMirror(TypeMirror serviceAnnotationMirror,
+                                               List<? extends AnnotationMirror> mirrors,
+                                               Types t) {
+
+        for (AnnotationMirror mirror : mirrors) {
+            if (t.isSameType(mirror.getAnnotationType().asElement().asType(), serviceAnnotationMirror)) {
+                return mirror;
+            }
+        }
+        return null;
+    }
+
+    static AnnotationValue getValueByName(AnnotationMirror mirror, String name) {
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
+                mirror.getElementValues().entrySet()) {
+            ExecutableElement exec = entry.getKey();
+            if (exec.getSimpleName().contentEquals(name)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    static String getValueStringByName(AnnotationMirror mirror, String name) {
+        AnnotationValue val = getValueByName(mirror, name);
+        if (val == null) {
+            return null;
+        } else {
+            return val.getValue().toString();
         }
     }
 }

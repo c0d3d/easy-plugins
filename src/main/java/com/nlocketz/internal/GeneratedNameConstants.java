@@ -12,6 +12,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 final class GeneratedNameConstants {
@@ -40,7 +41,7 @@ final class GeneratedNameConstants {
     static final ClassName ELEMENT_CLASS_NAME = ClassName.get(Element.class);
     static final ClassName EZ_SERVICE_EXCEPTION_CLASS_NAME = ClassName.get(EZServiceException.class);
     static final ClassName ROUND_ENV_CLASS_NAME = ClassName.get(RoundEnvironment.class);
-    static final ClassName COMPLETE_SERVICE_BUILDER_CLASS_NAME = ClassName.get(CompleteServiceBuilder.class);
+    static final ClassName COMPLETE_SERVICE_BUILDER_CLASS_NAME = ClassName.get(CompleteServiceGenerator.class);
     static final ClassName JAVA_FILE_CLASS_NAME = ClassName.get(JavaFile.class);
     static final ClassName ABSTRACT_PROCESSOR_CLASS_NAME = ClassName.get(AbstractProcessor.class);
     static final ClassName SUPPORTED_ANNOTATION_TYPES_CLASS_NAME = ClassName.get(SupportedAnnotationTypes.class);
@@ -49,6 +50,7 @@ final class GeneratedNameConstants {
     static final ClassName PROCESSOR_CLASS_NAME = ClassName.get(Processor.class);
     static final ClassName FILER_EXCEPTION_CLASS_NAME = ClassName.get(FilerException.class);
     static final ClassName MARKER_ANNOTATION_CLASS_NAME = ClassName.get(MarkerAnnotation.class);
+    static final ClassName SERVICE_LOADER_CLASS_NAME = ClassName.get(ServiceLoader.class);
 
     /* Type names */
     static final TypeName STRING_TYPE_NAME = TypeName.get(String.class);

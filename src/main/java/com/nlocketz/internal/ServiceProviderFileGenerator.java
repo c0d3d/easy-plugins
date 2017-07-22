@@ -5,49 +5,29 @@ import com.squareup.javapoet.*;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collections;
 
 import static com.nlocketz.internal.GeneratedNameConstants.*;
 import static com.nlocketz.internal.PoetUtil.publicFinalMethod;
 
 /**
  * Builds the service providers for our internal service
- * (the one created by {@link ServiceProviderInterfaceFileBuilder}).
+ * (the one created by {@link ServiceProviderInterfaceFileGenerator}). //TODO
  * There will be one provider for every {@link MarkedServiceClass} within a given {@link ServiceAnnotation}.
  */
-public class ServiceProviderFileBuilder extends AbstractServiceFileBuilder {
+class ServiceProviderFileGenerator extends AbstractServiceFileGenerator {
 
-    ServiceProviderFileBuilder(CompleteServiceBuilder overallBuilder) {
-        super(overallBuilder);
+    protected ServiceProviderFileGenerator(ProcessingEnvironment procEnv, RoundEnvironment roundEnv) {
+        super(procEnv, roundEnv);
     }
 
-    @Override
-    public List<JavaFile> buildFiles(ServiceAnnotation annotation, RoundEnvironment roundEnv, ProcessingEnvironment procEnv) {
-        List<JavaFile> result = new LinkedList<>();
-        List<String> processorQNames = new LinkedList<>();
-        for (MarkedServiceClass marked : annotation.getMarkedClasses(roundEnv, procEnv)) {
-            result.add(buildSingleMarkedClass(
-                    marked,
-                    annotation.getServiceInterfaceName(),
-                    annotation.getOutputPackage(),
-                    processorQNames));
-        }
-        String spInterface = annotation.getOutputPackage() + "." + annotation.getServiceInterfaceName();
-        overallBuilder.addToSpiOutput(spInterface, new HashSet<>(processorQNames));
-        return result;
-    }
-
-
-
-    private JavaFile buildSingleMarkedClass(MarkedServiceClass marked,
-                                            String interfaceName,
-                                            String outputPkg,
-                                            List<String> processorQNames) {
+    private void buildSingleMarkedClass(MarkedServiceClass marked,
+                                        String interfaceName,
+                                        String outputPkg,
+                                        ProcessorOutputCollection into) {
 
         String className = marked.getNewServiceClassName();
-        processorQNames.add(outputPkg + "." + className);
+        ClassName serviceInterfaceName = ClassName.get(outputPkg, interfaceName);
 
         MethodSpec getName = publicFinalMethod(GET_NAME_METHOD_NAME, STRING_TYPE_NAME)
                 .addStatement("return $L", marked.getServiceName())
@@ -62,7 +42,7 @@ public class ServiceProviderFileBuilder extends AbstractServiceFileBuilder {
         marked.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
 
         TypeSpec clazz = TypeSpec.classBuilder(className)
-                .addSuperinterface(ClassName.get(outputPkg, interfaceName))
+                .addSuperinterface(serviceInterfaceName)
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addMethod(getName)
@@ -70,6 +50,17 @@ public class ServiceProviderFileBuilder extends AbstractServiceFileBuilder {
                 .addMethod(createWithConfigBuilder.build())
                 .build();
 
-        return JavaFile.builder(outputPkg, clazz).build();
+        into.putType(outputPkg, clazz, Collections.singletonList(serviceInterfaceName));
+    }
+
+    @Override
+    public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
+        for (MarkedServiceClass marked : marker.getMarkedClasses(roundEnv, types, elements)) {
+            buildSingleMarkedClass(
+                    marked,
+                    marker.getServiceInterfaceProviderName(),
+                    marker.getOutputPackage(),
+                    into);
+        }
     }
 }
