@@ -3,6 +3,7 @@ package com.nlocketz;
 
 import com.google.auto.service.AutoService;
 import com.nlocketz.internal.CompletePluginGenerator;
+import com.nlocketz.internal.EasyPluginException;
 import com.nlocketz.internal.ProcessorOutputCollection;
 
 import javax.annotation.processing.*;

@@ -1,6 +1,5 @@
 package com.nlocketz.internal;
 
-import com.nlocketz.EasyPluginException;
 import com.nlocketz.Service;
 
 import javax.annotation.processing.ProcessingEnvironment;

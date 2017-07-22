@@ -1,6 +1,5 @@
 package com.nlocketz.internal;
 
-import com.nlocketz.EasyPluginException;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 

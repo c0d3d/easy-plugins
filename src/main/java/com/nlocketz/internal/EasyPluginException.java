@@ -1,4 +1,6 @@
-package com.nlocketz;
+package com.nlocketz.internal;
+
+import com.nlocketz.EasyPluginProcessor;
 
 import javax.annotation.processing.RoundEnvironment;
 import java.util.Set;
