@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.com/c0d3d/easy-plugins.svg?token=WCZtmkmGWRwQ4rzxFg7j&branch=master)](https://travis-ci.com/c0d3d/easy-plugins)
