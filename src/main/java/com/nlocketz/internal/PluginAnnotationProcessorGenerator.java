@@ -5,10 +5,9 @@ import com.squareup.javapoet.*;
 import javax.annotation.processing.*;
 import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
-import java.io.IOException;
 import java.util.Collections;
 
-import static com.nlocketz.internal.GeneratedNameConstants.*;
+import static com.nlocketz.internal.Constants.*;
 
 public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenerator {
 

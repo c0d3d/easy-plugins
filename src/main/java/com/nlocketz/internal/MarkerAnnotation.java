@@ -5,7 +5,7 @@ import com.squareup.javapoet.MethodSpec;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Types;
 
-import static com.nlocketz.internal.GeneratedNameConstants.MARKER_ANNOTATION_CLASS_NAME;
+import static com.nlocketz.internal.Constants.MARKER_ANNOTATION_CLASS_NAME;
 
 class MarkerAnnotation {
     private String siName;

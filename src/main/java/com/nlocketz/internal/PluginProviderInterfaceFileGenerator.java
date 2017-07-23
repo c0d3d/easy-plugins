@@ -6,7 +6,7 @@ import com.squareup.javapoet.TypeSpec;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 
-import static com.nlocketz.internal.GeneratedNameConstants.*;
+import static com.nlocketz.internal.Constants.*;
 
 public class PluginProviderInterfaceFileGenerator extends AbstractPluginFileGenerator {
 

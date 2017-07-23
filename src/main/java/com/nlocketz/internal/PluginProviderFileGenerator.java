@@ -7,7 +7,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
 import java.util.Collections;
 
-import static com.nlocketz.internal.GeneratedNameConstants.*;
+import static com.nlocketz.internal.Constants.*;
 import static com.nlocketz.internal.Util.publicFinalMethod;
 
 /**
