@@ -1,4 +1,4 @@
-# Easy Plugins [![Build Status](https://travis-ci.com/c0d3d/easy-plugins.svg?token=WCZtmkmGWRwQ4rzxFg7j&branch=master)](https://travis-ci.com/c0d3d/easy-plugins)
+# Easy Plugins [![Build Status](https://travis-ci.org/c0d3d/easy-plugins.svg?branch=master)](https://travis-ci.org/c0d3d/easy-plugins)
 
 Easy plugins is a library that lets you easily develop using a seamless service based architecture in Java!
 
