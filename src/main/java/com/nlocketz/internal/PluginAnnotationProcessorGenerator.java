@@ -69,7 +69,7 @@ public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenera
                         .build();
 
         TypeSpec procSpec =
-                TypeSpec.classBuilder(marker.getProcessorServiceName() + "Processor")
+                TypeSpec.classBuilder(marker.getProcessorServiceName())
                         .superclass(ABSTRACT_PROCESSOR_CLASS_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                         .addAnnotation(

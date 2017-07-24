@@ -15,13 +15,16 @@ public final class CompletePluginGenerator {
      * @return The newly built pipeline.
      */
     private static List<PluginFileGenerator> generatorList(ProcessingEnvironment procEnv,
-                                                           RoundEnvironment roundEnv) {
-        return Arrays.asList(
-                new PluginProviderInterfaceFileGenerator(procEnv, roundEnv),
-                new PluginProviderFileGenerator(procEnv, roundEnv),
-                new PluginRegistryFileGenerator(procEnv, roundEnv),
-                new PluginAnnotationProcessorGenerator(procEnv, roundEnv)
-        );
+                                                           RoundEnvironment roundEnv,
+                                                           boolean specialized) {
+        List<PluginFileGenerator> gens = new LinkedList<>();
+        gens.add(new PluginProviderInterfaceFileGenerator(procEnv, roundEnv));
+        gens.add(new PluginProviderFileGenerator(procEnv, roundEnv));
+        gens.add(new PluginRegistryFileGenerator(procEnv, roundEnv));
+        if (!specialized) {
+            gens.add(new PluginAnnotationProcessorGenerator(procEnv, roundEnv));
+        }
+        return gens;
     }
 
     private CompletePluginGenerator() {
@@ -32,46 +35,43 @@ public final class CompletePluginGenerator {
             UserMarkerAnnotation annotation,
             ProcessingEnvironment procEnv,
             RoundEnvironment roundEnv,
-            ProcessorOutputCollection output) {
+            ProcessorOutputCollection output,
+            boolean specialized) {
 
-        for (PluginFileGenerator subGen : generatorList(procEnv, roundEnv)) {
+        for (PluginFileGenerator subGen : generatorList(procEnv, roundEnv, specialized)) {
             subGen.generate(annotation, output);
         }
 
         return output;
     }
 
-    private static void buildServiceFilesInternal(UserMarkerAnnotation annotation,
-                                                  RoundEnvironment roundEnv,
-                                                  ProcessingEnvironment procEnv,
-                                                  ProcessorOutputCollection output) {
-
-        buildFiles(annotation, procEnv, roundEnv, output);
-    }
-
     public static void buildServiceFiles(Element annotationElement,
-                                                   RoundEnvironment roundEnv,
-                                                   ProcessingEnvironment procEnv,
-                                                   ProcessorOutputCollection output) {
-        buildServiceFilesInternal(
-                PluginAnnotation.createUserMarker(annotationElement, procEnv), roundEnv, procEnv, output);
+                                         RoundEnvironment roundEnv,
+                                         ProcessingEnvironment procEnv,
+                                         ProcessorOutputCollection output) {
+        buildFiles(
+                PluginAnnotation.createUserMarker(annotationElement, procEnv),
+                procEnv,
+                roundEnv,
+                output,
+                false);
 
 
     }
 
     public static void buildSpecializedServiceFiles(Element annotationElement,
-                                                              MarkerAnnotation ma,
-                                                              RoundEnvironment roundEnv,
-                                                              ProcessingEnvironment procEnv,
-                                                              ProcessorOutputCollection output) {
+                                                    MarkerAnnotation ma,
+                                                    RoundEnvironment roundEnv,
+                                                    ProcessingEnvironment procEnv,
+                                                    ProcessorOutputCollection output) {
         if (!annotationElement.getKind().isInterface()) {
             throw new IllegalStateException("Specialized processor must be given annotation");
         }
 
-        buildServiceFilesInternal(
-                new UserMarkerAnnotation((TypeElement)annotationElement, ma, procEnv),
-                roundEnv,
+        buildFiles(new UserMarkerAnnotation((TypeElement)annotationElement, ma, procEnv),
                 procEnv,
-                output);
+                roundEnv,
+                output,
+                true);
     }
 }
