@@ -1,10 +1,10 @@
 # Easy Plugins [![Build Status](https://travis-ci.com/c0d3d/easy-plugins.svg?token=WCZtmkmGWRwQ4rzxFg7j&branch=master)](https://travis-ci.com/c0d3d/easy-plugins)
 
-Easy plugins is a library that lets you easily develop using a seamless service based archetecture in Java!
+Easy plugins is a library that lets you easily develop using a seamless service based architecture in Java!
 
 ## Example
 
-To use easy plugins simple annotate an annotation that you wrote with `@Service`.
+To use easy plugins simply annotate an annotation that you write with `@Service`.
 `@Service` has three required values and one optional one.
 They are:
 1. `value`: This is the name of the service you are creating
@@ -52,7 +52,7 @@ and another one.
 		}
 	}
 
-Now you have a service with two provides named `AccurateAdder`, and `InaccurateAdder`.
+Now you have a service with two providers named `AccurateAdder`, and `InaccurateAdder`.
 
 To access them you use the class `AdderServiceRegistry` which has been generated as a result of annotating `AdderService` with `@Service`.
 
@@ -90,7 +90,7 @@ Here is an example `Adder` that uses configuration information:
 	    }
 	}
 
-and the usage like this:
+and the usage is like this:
 
 	Adder offset = AdderServiceRegistry.getAdderServiceByNameWithConfig("OffsetAdder",
 		Collections.singletonMap("offset", "3"));
