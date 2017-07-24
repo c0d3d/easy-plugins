@@ -11,13 +11,12 @@ public @interface Service {
     String value();
     Class<?> serviceInterface();
 
-    // TODO this needs a better name
     /**
      * This is the name of the field in the annotation annotated with this annotation to look for the name
      * of the service when you mark a class.
      * @return the name of the field to look for service names in
      */
-    String annotationFieldNameForServiceName() default "value";
+    String serviceNameKey() default "value";
 
     String outputPackage();
 

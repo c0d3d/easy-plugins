@@ -58,7 +58,7 @@ class PluginAnnotation {
         }
 
         String serviceName = serviceAnnotations[0].value();
-        String serviceNameFromAnnotaion = serviceAnnotations[0].annotationFieldNameForServiceName();
+        String serviceNameFromAnnotaion = serviceAnnotations[0].serviceNameKey();
         String outputPackage = serviceAnnotations[0].outputPackage();
 
         return new UserMarkerAnnotation(

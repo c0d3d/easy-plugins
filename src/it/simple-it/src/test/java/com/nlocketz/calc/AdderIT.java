@@ -7,9 +7,15 @@ import static org.junit.Assert.*;
 import com.nlocketz.adders.api.Adder;
 import com.nlocketz.adders.generated.AdderServiceRegistry;
 import com.nlocketz.composers.generated.ComposerServiceRegistry;
-
+import java.util.Collections;
 
 public class AdderIT {
+
+    @Test
+    public void testAdder4() {
+        Adder offset = AdderServiceRegistry.getAdderServiceByNameWithConfig("OffsetAdder", Collections.singletonMap("offset", "3"));
+        assertEquals(3, offset.add(0, 0));
+    }
 
     @Test
     public void testAdder1() {
