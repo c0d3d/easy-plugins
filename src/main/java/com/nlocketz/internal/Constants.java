@@ -7,10 +7,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.*;
 
 public final class Constants {
 
@@ -25,11 +22,12 @@ public final class Constants {
     static final String PROCESSING_ENV_NAME = "processingEnv";
     static final String PROCESS_ANNOTATED_ELEMENT_ELEMENT_ARG_NAME = "element";
     static final String PROCESS_ANNOTATED_ELEMENT_METHOD_NAME = "processAnnotatedElement";
+    static final String PLUGIN_MAP = "pluginMap";
 
     /* These are only used to construct generic types in here */
     static final ClassName STRING_CLASS_NAME = ClassName.get(String.class);
     static final ClassName MAP_CLASS_NAME = ClassName.get(Map.class);
-    static final ClassName LIST_CLASS_NAME = ClassName.get(List.class);
+    static final ClassName HASHMAP_CLASS_NAME = ClassName.get(HashMap.class);
     static final ClassName SET_CLASS_NAME = ClassName.get(Set.class);
 
     /* Class names used */
@@ -38,7 +36,6 @@ public final class Constants {
     static final ClassName EZ_SERVICE_EXCEPTION_CLASS_NAME = ClassName.get(EasyPluginException.class);
     static final ClassName ROUND_ENV_CLASS_NAME = ClassName.get(RoundEnvironment.class);
     static final ClassName COMPLETE_SERVICE_BUILDER_CLASS_NAME = ClassName.get(CompletePluginGenerator.class);
-    static final ClassName JAVA_FILE_CLASS_NAME = ClassName.get(JavaFile.class);
     static final ClassName ABSTRACT_PROCESSOR_CLASS_NAME = ClassName.get(AbstractProcessor.class);
     static final ClassName SUPPORTED_ANNOTATION_TYPES_CLASS_NAME = ClassName.get(SupportedAnnotationTypes.class);
     static final ClassName SUPPORTED_SOURCE_VERSION_CLASS_NAME = ClassName.get(SupportedSourceVersion.class);
