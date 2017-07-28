@@ -4,7 +4,7 @@
 
     <groupId>com.nlocketz.plugins</groupId>
     <artifactId>easy-plugins</artifactId>
-    <version>0.1.3-SNAPSHOT</version>
+    <version>0.1.3</version>
 
     <parent>
         <groupId>com.nlocketz.parent</groupId>
@@ -39,7 +39,7 @@
         <url>git@github.com:c0d3d/EZServiceProvider.git</url>
         <connection>scm:git:git://github.com/c0d3d/EZServiceProvider.git</connection>
         <developerConnection>scm:git:git@github.com:c0d3d/EZServiceProvider.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>easy-plugins-0.1.3</tag>
     </scm>
 
     <dependencies>
