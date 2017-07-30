@@ -1,4 +1,6 @@
 language: java
 jdk:
   - oraclejdk8
-script: mvn verify
+  - openjdk8
+  - openjdk7
+script: mvn
