@@ -4,11 +4,9 @@ import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.FilerException;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
@@ -139,6 +137,68 @@ final class Util {
             return null;
         } else {
             return val.getValue().toString();
+        }
+    }
+
+    private static boolean isNestedClass(TypeElement element) {
+        Element enclosing = element.getEnclosingElement();
+        return enclosing != null && enclosing.getKind().isClass();
+    }
+
+    private static void checkElementVisibilityNoNest(Elements eles, TypeElement target, String from) {
+        Set<Modifier> targetMods = target.getModifiers();
+        PackageElement targetPkg = eles.getPackageOf(target);
+
+        // TODO this is terrible
+        if ((!targetPkg.getQualifiedName().toString().equals(from)
+                || targetMods.contains(Modifier.PROTECTED)
+                || targetMods.contains(Modifier.PRIVATE))
+                && !targetMods.contains(Modifier.PUBLIC)) {
+            throw new EasyPluginException("Access modifiers block usage of " + target.toString());
+        }
+    }
+
+    static void checkElementVisibility(Elements eles, TypeElement target, String from) {
+        Set<Modifier> targetMods = target.getModifiers();
+        if (!isNestedClass(target)) {
+            checkElementVisibilityNoNest(eles, target, from);
+        } else {
+            Element surround = target.getEnclosingElement();
+
+            if (surround.getKind() != ElementKind.CLASS
+                    && surround.getKind() != ElementKind.INTERFACE) {
+                throw new IllegalStateException("?!?!: "+surround.getKind());
+            }
+
+            TypeElement enclosingType = (TypeElement) surround;
+
+            // The surrounding class must be visible for us to see the nested class
+            if (!isElementVisibleFrom(eles, enclosingType, from)) {
+                throw new EasyPluginException(enclosingType.toString()
+                        + " is not visible from output package; need for access to " + target.toString());
+            }
+            // Nested class must be static since we don't have an enclosing instance
+            if (!targetMods.contains(Modifier.STATIC)) {
+                throw new EasyPluginException(target.toString() + " must be static to get service instance.");
+            }
+
+            checkElementVisibilityNoNest(eles, target, from);
+        }
+    }
+
+    private static boolean isElementVisibleFrom(Elements eles, TypeElement target, String from) {
+        try {
+            checkElementVisibility(eles, target, from);
+            return true;
+        } catch (EasyPluginException e) {
+            return false;
+        }
+    }
+
+    static void checkConcreteType(TypeElement e) {
+        Set<Modifier> mods = e.getModifiers();
+        if (mods.contains(Modifier.ABSTRACT) || e.getKind().isInterface()) {
+            throw new EasyPluginException(e.toString() + " must be concrete to use as a service.");
         }
     }
 }

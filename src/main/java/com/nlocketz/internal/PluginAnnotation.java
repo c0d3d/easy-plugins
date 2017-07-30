@@ -3,6 +3,7 @@ package com.nlocketz.internal;
 import com.nlocketz.Service;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 
@@ -58,6 +59,11 @@ class PluginAnnotation {
         }
 
         String serviceName = serviceAnnotations[0].value();
+
+        if (!SourceVersion.isName(serviceName)) {
+            throw new EasyPluginException(String.format("Service name isn't a valid java name: '%s'", serviceName));
+        }
+
         String serviceNameFromAnnotaion = serviceAnnotations[0].serviceNameKey();
         String outputPackage = serviceAnnotations[0].outputPackage();
 

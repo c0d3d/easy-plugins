@@ -5,6 +5,7 @@ import com.squareup.javapoet.*;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import java.util.Collections;
 
 import static com.nlocketz.internal.Constants.*;
@@ -49,6 +50,12 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
                 .addMethod(createBuilder.build())
                 .addMethod(createWithConfigBuilder.build())
                 .build();
+
+        TypeElement implementorTypeElement = elements.getTypeElement(marked.getTypeName().toString());
+
+        // Check for visibility issues, and a non concrete type ...
+        Util.checkElementVisibility(elements, implementorTypeElement, outputPkg);
+        Util.checkConcreteType(implementorTypeElement);
 
         into.putType(outputPkg, clazz, Collections.singletonList(serviceInterfaceName));
     }
