@@ -133,8 +133,12 @@ class MarkedPluginClass {
         return serviceName;
     }
 
-    // TODO make sure nested classes work
     String getNewServiceClassName() {
-        return clazzElement.getQualifiedName().toString().replace('.','$') + "$Service$" + serviceName.replace("\"", "");
+        return clazzElement.getQualifiedName()
+                .toString().replace('.','$') + "$Service$" + serviceName.replace("\"", "");
+    }
+
+    TypeElement getAnnotatedEle() {
+        return clazzElement;
     }
 }

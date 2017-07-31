@@ -26,6 +26,9 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
                                         String interfaceName,
                                         String outputPkg,
                                         ProcessorOutputCollection into) {
+        if (outputPkg.equals("")) {
+            outputPkg = elements.getPackageOf(marked.getAnnotatedEle()).toString();
+        }
 
         String className = marked.getNewServiceClassName();
         ClassName serviceInterfaceName = ClassName.get(outputPkg, interfaceName);
@@ -66,7 +69,7 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
             buildSingleMarkedClass(
                     marked,
                     marker.getServiceInterfaceProviderName(),
-                    marker.getOutputPackage(),
+                    marker.getOutputPackage(elements),
                     into);
         }
     }

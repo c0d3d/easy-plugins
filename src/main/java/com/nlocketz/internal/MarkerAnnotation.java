@@ -2,7 +2,9 @@ package com.nlocketz.internal;
 
 import com.squareup.javapoet.MethodSpec;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import static com.nlocketz.internal.Constants.MARKER_ANNOTATION_CLASS_NAME;
@@ -43,7 +45,10 @@ class MarkerAnnotation {
      * @param annotation The service annotation to gather info from.
      * @return The name of the new instance.
      */
-    public static String addMarkerAnnotationInstance(MethodSpec.Builder builder, UserMarkerAnnotation annotation, Types types) {
+    public static String addMarkerAnnotationInstance(MethodSpec.Builder builder,
+                                                     UserMarkerAnnotation annotation,
+                                                     Types types,
+                                                     Elements elements) {
 
         String siName =
                 ((TypeElement)types.asElement(annotation.getServiceInterfaceType())).getQualifiedName().toString();
@@ -55,7 +60,7 @@ class MarkerAnnotation {
                 siName,
                 annotation.getServiceInterfaceName(),
                 annotation.getIndividualNameKey(),
-                annotation.getOutputPackage());
+                annotation.getOutputPackage(elements));
 
         return "marker";
     }

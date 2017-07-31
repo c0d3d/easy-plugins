@@ -25,7 +25,7 @@ public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenera
                         .addParameter(ROUND_ENV_CLASS_NAME, ROUND_ENV_NAME);
 
         String markerAnnotationName =
-                MarkerAnnotation.addMarkerAnnotationInstance(processBuilder, marker, types);
+                MarkerAnnotation.addMarkerAnnotationInstance(processBuilder, marker, types, elements);
 
         MethodSpec processAnnotatedElement =
                 Util.privateMethod(PROCESS_ANNOTATED_ELEMENT_METHOD_NAME, TypeName.VOID)

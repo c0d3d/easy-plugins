@@ -5,7 +5,6 @@ import com.squareup.javapoet.*;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
-import java.util.ServiceLoader;
 
 import static com.nlocketz.internal.Constants.*;
 import static com.nlocketz.internal.Util.privateField;
@@ -24,8 +23,8 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
     @Override
     public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
         String registryClassName = marker.getRegistryServiceName();
-        ClassName spiName = ClassName.get(marker.getOutputPackage(), marker.getServiceInterfaceProviderName());
-        ClassName registryName = ClassName.get(marker.getOutputPackage(), registryClassName);
+        ClassName spiName = ClassName.get(marker.getOutputPackage(elements), marker.getServiceInterfaceProviderName());
+        ClassName registryName = ClassName.get(marker.getOutputPackage(elements), registryClassName);
         ParameterizedTypeName genericServiceLoaderName = ParameterizedTypeName.get(SERVICE_LOADER_CLASS_NAME, spiName);
         ParameterizedTypeName genericMapName = ParameterizedTypeName.get(MAP_CLASS_NAME, STRING_TYPE_NAME, spiName);
         ParameterizedTypeName genericHashmapName = ParameterizedTypeName.get(HASHMAP_CLASS_NAME, STRING_TYPE_NAME, spiName);
@@ -82,6 +81,6 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
                                 .build())
                 .build();
 
-        into.putType(marker.getOutputPackage(), classSpec);
+        into.putType(marker.getOutputPackage(elements), classSpec);
     }
 }

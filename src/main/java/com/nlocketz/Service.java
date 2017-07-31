@@ -18,6 +18,11 @@ public @interface Service {
      */
     String serviceNameKey() default "value";
 
-    String outputPackage();
+    /**
+     * The output package of the generated classes.
+     * Default is {@code ""} which means output in the same package as the service.
+     * @return The output package for generated classes.
+     */
+    String outputPackage() default "";
 
 }

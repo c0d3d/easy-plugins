@@ -31,6 +31,6 @@ public class PluginProviderInterfaceFileGenerator extends AbstractPluginFileGene
                                 .build())
                 .build();
 
-        into.putType(marker.getOutputPackage(), type);
+        into.putType(marker.getOutputPackage(elements), type);
     }
 }

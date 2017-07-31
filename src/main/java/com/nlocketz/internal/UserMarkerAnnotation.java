@@ -134,8 +134,12 @@ public class UserMarkerAnnotation {
         return serviceBaseName;
     }
 
-    public String getOutputPackage() {
-        return outputPackage;
+    public String getOutputPackage(Elements elements) {
+        if (outputPackage.equals("")) {
+            return elements.getPackageOf(markingAnnotation).getQualifiedName().toString();
+        } else {
+            return outputPackage;
+        }
     }
 
     public TypeMirror getServiceInterfaceType() {
@@ -171,5 +175,9 @@ public class UserMarkerAnnotation {
 
     public String getServiceInterfaceProviderName() {
         return serviceBaseName + "Provider";
+    }
+
+    public TypeElement getMarkerAnnotationElement() {
+        return markingAnnotation;
     }
 }
