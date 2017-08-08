@@ -78,7 +78,7 @@ public class PluginAnnotationProcessorGenerator extends AbstractPluginFileGenera
                                         .build())
                         .addAnnotation(
                                 AnnotationSpec.builder(SUPPORTED_SOURCE_VERSION_CLASS_NAME)
-                                        .addMember("value", "$T.RELEASE_8", SOURCE_VERSION_CLASS_NAME)
+                                        .addMember("value", "$T.RELEASE_7", SOURCE_VERSION_CLASS_NAME)
                                         .build())
                         .addMethod(process)
                         .addMethod(processAnnotatedElement)

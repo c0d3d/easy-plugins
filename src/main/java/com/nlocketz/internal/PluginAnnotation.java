@@ -35,12 +35,7 @@ class PluginAnnotation {
         TypeElement annotationMarkingSP = (TypeElement) annotationElement;
 
 
-        Service[] serviceAnnotations = annotationElement.getAnnotationsByType(Service.class);
-
-        if (serviceAnnotations.length != 1) {
-            throw new EasyPluginException(
-                    "Can only have one service annotaion, 0, or more than one detected: " + serviceAnnotations.length);
-        }
+        Service serviceAnnotation = annotationElement.getAnnotation(Service.class);
 
         AnnotationMirror serviceMirror =
                 Util.getMatchingMirror(
@@ -58,14 +53,14 @@ class PluginAnnotation {
                     "Couldn't find interface class named: " + interfaceQName);
         }
 
-        String serviceName = serviceAnnotations[0].value();
+        String serviceName = serviceAnnotation.value();
 
         if (!SourceVersion.isName(serviceName)) {
             throw new EasyPluginException(String.format("Service name isn't a valid java name: '%s'", serviceName));
         }
 
-        String serviceNameFromAnnotaion = serviceAnnotations[0].serviceNameKey();
-        String outputPackage = serviceAnnotations[0].outputPackage();
+        String serviceNameFromAnnotaion = serviceAnnotation.serviceNameKey();
+        String outputPackage = serviceAnnotation.outputPackage();
 
         return new UserMarkerAnnotation(
                 annotationMarkingSP,

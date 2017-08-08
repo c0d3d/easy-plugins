@@ -58,7 +58,7 @@ public class ProcessorOutputCollection {
     }
 
     public void putType(String outputPackage, TypeSpec type) {
-        putType(outputPackage, type, Collections.emptyList());
+        putType(outputPackage, type, Collections.<ClassName>emptyList());
     }
 
     public static ProcessorOutputCollection empty() {
