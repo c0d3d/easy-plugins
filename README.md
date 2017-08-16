@@ -1,4 +1,4 @@
-# Easy Plugins [![Build Status](https://travis-ci.org/c0d3d/easy-plugins.svg?branch=master)](https://travis-ci.org/c0d3d/easy-plugins)
+# Easy Plugins [![Build Status](https://travis-ci.org/c0d3d/easy-plugins.svg?branch=master)](https://travis-ci.org/c0d3d/easy-plugins) [![Maven Central](https://img.shields.io/maven-central/v/com.nlocketz.plugins/easy-plugins.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.nlocketz.plugins%22%20a%3A%22easy-plugins%22)
 
 Easy plugins is a library that lets you easily develop using a seamless service based architecture in Java!
 
