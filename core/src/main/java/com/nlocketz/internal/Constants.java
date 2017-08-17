@@ -1,5 +1,6 @@
 package com.nlocketz.internal;
 
+import com.nlocketz.Service;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.*;
@@ -109,6 +110,7 @@ public final class Constants {
             TypeVariableName.class.getResource("TypeVariableName.class"),
             ClassName.class.getResource("ClassName.class"),
             ParameterizedTypeName.class.getResource("ParameterizedTypeName.class"),
-            AnnotationSpec.class.getResource("AnnotationSpec$Builder.class")
+            AnnotationSpec.class.getResource("AnnotationSpec$Builder.class"),
+            Service.class.getResource("Service.class")
     };
 }
