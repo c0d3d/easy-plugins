@@ -25,6 +25,7 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
         String registryClassName = marker.getRegistryServiceName();
         ClassName spiName = ClassName.get(marker.getOutputPackage(elements), marker.getServiceInterfaceProviderName());
         ClassName registryName = ClassName.get(marker.getOutputPackage(elements), registryClassName);
+        TypeName threadName = TypeName.get(Thread.class);
         ParameterizedTypeName genericServiceLoaderName = ParameterizedTypeName.get(SERVICE_LOADER_CLASS_NAME, spiName);
         ParameterizedTypeName genericMapName = ParameterizedTypeName.get(MAP_CLASS_NAME, STRING_TYPE_NAME, spiName);
         ParameterizedTypeName genericHashmapName = ParameterizedTypeName.get(HASHMAP_CLASS_NAME, STRING_TYPE_NAME, spiName);
@@ -44,6 +45,7 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
                 .addMethod(
                         MethodSpec.constructorBuilder()
                                 .addModifiers(Modifier.PRIVATE)
+                                .addStatement("$T.currentThread().setContextClassLoader($T.class.getClassLoader())", threadName, spiName)
                                 .addStatement("$L = new $T()", PLUGIN_MAP, genericHashmapName)
                                 .addStatement("$T $L = $T.load($T.class)",
                                         genericServiceLoaderName,
