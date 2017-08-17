@@ -7,12 +7,14 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-class MarkedPluginClass {
+public class MarkedPluginClass {
 
+    private List<List<TypeName>> constructorSignatures;
     private TypeElement clazzElement;
 
     /**
@@ -33,6 +35,7 @@ class MarkedPluginClass {
                       Elements elements) {
 
         this.clazzElement = clazzElement;
+        this.constructorSignatures = new ArrayList<>(2);
         MutBool defaultConst = new MutBool();
         MutBool mapConst = new MutBool();
         computeConstructors(clazzElement, defaultConst, mapConst, types, elements);
@@ -58,7 +61,7 @@ class MarkedPluginClass {
      * Gets the {@link TypeName} for this marked service class
      * @return The typename
      */
-    TypeName getTypeName() {
+    public TypeName getTypeName() {
         return TypeName.get(clazzElement.asType());
     }
 
@@ -75,7 +78,7 @@ class MarkedPluginClass {
      * @param types The current type utils.
      * @param elements The current element utils.
      */
-    private static void computeConstructors(TypeElement clazzElement,
+    private void computeConstructors(TypeElement clazzElement,
                                             MutBool defaultConst,
                                             MutBool mapConst,
                                             Types types,
@@ -85,6 +88,11 @@ class MarkedPluginClass {
             if (e.getKind() == ElementKind.CONSTRUCTOR) {
                 ExecutableElement ee = (ExecutableElement) e;
                 List<? extends VariableElement> params = ee.getParameters();
+                List<TypeName> signature = new ArrayList<>(params.size());
+                for (VariableElement variableElement : params) {
+                    signature.add(TypeName.get(types.erasure(variableElement.asType())));
+                }
+                this.constructorSignatures.add(signature);
                 if (!defaultConst.val && params.size() == 0) {
                     defaultConst.val = true;
                 }
@@ -107,7 +115,7 @@ class MarkedPluginClass {
      * @param getByNameBuilder The builder to add to.
      * @param mapName The name of the configuration map in scope.
      */
-    void addMapConstructorCall(MethodSpec.Builder getByNameBuilder, String mapName) {
+    public void addMapConstructorCall(MethodSpec.Builder getByNameBuilder, String mapName) {
         if (constWithMap != null) {
             getByNameBuilder.addStatement(String.format(constWithMap, "$L"), mapName);
         } else {
@@ -121,7 +129,7 @@ class MarkedPluginClass {
      * If the "default" means an empty map, one will be supplied.
      * @param getByNameBuilder The builder to add the constructions to.
      */
-    void addDefaultConstructorCall(MethodSpec.Builder getByNameBuilder) {
+    public void addDefaultConstructorCall(MethodSpec.Builder getByNameBuilder) {
         if (defaultConstString != null) {
             getByNameBuilder.addStatement(defaultConstString);
         } else {
@@ -129,16 +137,16 @@ class MarkedPluginClass {
         }
     }
 
-    String getServiceName() {
+    public String getServiceName() {
         return serviceName;
     }
 
-    String getNewServiceClassName() {
+    public String getNewServiceClassName() {
         return clazzElement.getQualifiedName()
                 .toString().replace('.','$') + "$Service$" + serviceName.replace("\"", "");
     }
 
-    TypeElement getAnnotatedEle() {
+    public TypeElement getAnnotatedEle() {
         return clazzElement;
     }
 }

@@ -6,6 +6,8 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
 
+import java.util.ServiceLoader;
+
 import static com.nlocketz.internal.Constants.*;
 import static com.nlocketz.internal.Util.privateField;
 import static com.nlocketz.internal.Util.privateStaticField;
@@ -29,7 +31,7 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
         ParameterizedTypeName genericServiceLoaderName = ParameterizedTypeName.get(SERVICE_LOADER_CLASS_NAME, spiName);
         ParameterizedTypeName genericMapName = ParameterizedTypeName.get(MAP_CLASS_NAME, STRING_TYPE_NAME, spiName);
         ParameterizedTypeName genericHashmapName = ParameterizedTypeName.get(HASHMAP_CLASS_NAME, STRING_TYPE_NAME, spiName);
-        TypeSpec classSpec = TypeSpec.classBuilder(registryClassName)
+        TypeSpec.Builder classSpecBuilder = TypeSpec.classBuilder(registryClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(privateStaticField(registryName, INSTANCE_FIELD_NAME).build())
                 .addField(privateField(genericMapName, PLUGIN_MAP).build())
@@ -80,8 +82,16 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
                                         PLUGIN_MAP, PROVIDER_NAME_ARG_NAME, CONFIG_NAME_ARG_NAME)
                                 .endControlFlow()
                                 .addStatement("return null")
-                                .build())
-                .build();
+                                .build());
+
+        ServiceLoader<EasyPluginPlugin> pluginServiceLoader = ServiceLoader.load(EasyPluginPlugin.class);
+        for (EasyPluginPlugin plugin : pluginServiceLoader) {
+            for (MethodSpec methodSpec : plugin.registryMethods(marker)) {
+                classSpecBuilder = classSpecBuilder.addMethod(methodSpec);
+            }
+        }
+
+        TypeSpec classSpec = classSpecBuilder.build();
 
         into.putType(marker.getOutputPackage(elements), classSpec);
     }

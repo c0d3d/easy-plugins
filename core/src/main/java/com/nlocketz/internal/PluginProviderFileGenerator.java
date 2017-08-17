@@ -7,6 +7,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import java.util.Collections;
+import java.util.ServiceLoader;
 
 import static com.nlocketz.internal.Constants.*;
 import static com.nlocketz.internal.Util.publicFinalMethod;
@@ -45,14 +46,22 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
                         .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME);
         marked.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
 
-        TypeSpec clazz = TypeSpec.classBuilder(className)
+        TypeSpec.Builder clazzBuilder = TypeSpec.classBuilder(className)
                 .addSuperinterface(serviceInterfaceName)
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addMethod(getName)
                 .addMethod(createBuilder.build())
-                .addMethod(createWithConfigBuilder.build())
-                .build();
+                .addMethod(createWithConfigBuilder.build());
+
+        ServiceLoader<EasyPluginPlugin> pluginServiceLoader = ServiceLoader.load(EasyPluginPlugin.class);
+        for (EasyPluginPlugin plugin : pluginServiceLoader) {
+            for (MethodSpec methodSpec : plugin.pluginProviderMethods(marked)) {
+               clazzBuilder = clazzBuilder.addMethod(methodSpec);
+            }
+        }
+
+        TypeSpec clazz = clazzBuilder.build();
 
         TypeElement implementorTypeElement = elements.getTypeElement(marked.getTypeName().toString());
 
