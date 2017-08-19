@@ -33,6 +33,7 @@
                     <pomIncludes>
                         <pomInclude>*/pom.xml</pomInclude>
                     </pomIncludes>
+                    <showErrors>true</showErrors>
                 </configuration>
                 <executions>
                     <execution>
