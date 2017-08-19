@@ -124,6 +124,8 @@ to include methods which accept Guice injectors. For example, one can do the fol
 
 ```java
 import java.util.Map;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.nlocketz.adders.api.Adder;
 import com.nlocketz.adders.api.AdderService;
 
@@ -135,6 +137,7 @@ public class AdderN implements Adder {
         offset = Integer.parseInt(config.get("defaultOffset"));
     }
 
+    @Inject(optional = true)
     public void setOffset(@Named("offset") Integer offset) {
         this.offset = offset;
     }
