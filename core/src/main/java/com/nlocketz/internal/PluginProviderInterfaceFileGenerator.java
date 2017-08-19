@@ -7,8 +7,6 @@ import com.squareup.javapoet.TypeSpec;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 
-import java.util.ServiceLoader;
-
 import static com.nlocketz.internal.Constants.*;
 
 public class PluginProviderInterfaceFileGenerator extends AbstractPluginFileGenerator {
@@ -33,8 +31,7 @@ public class PluginProviderInterfaceFileGenerator extends AbstractPluginFileGene
                                 .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME)
                                 .build());
 
-        ServiceLoader<EasyPluginPlugin> pluginServiceLoader = ServiceLoader.load(EasyPluginPlugin.class);
-        for (EasyPluginPlugin plugin : pluginServiceLoader) {
+        for (EasyPluginPlugin plugin : Util.getPluginLoader()) {
             for (MethodSpec methodSpec : plugin.pluginProviderInterfaceMethods(marker)) {
                 typeBuilder = typeBuilder.addMethod(methodSpec);
             }

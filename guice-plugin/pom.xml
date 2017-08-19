@@ -29,6 +29,7 @@
             <groupId>com.nlocketz.plugins</groupId>
             <artifactId>easy-plugins</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
@@ -36,7 +37,7 @@
             <version>${guice.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google</groupId>
+            <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
@@ -51,6 +52,7 @@
                     <pomIncludes>
                         <pomInclude>*/pom.xml</pomInclude>
                     </pomIncludes>
+                    <showErrors>true</showErrors>
                 </configuration>
                 <executions>
                     <execution>

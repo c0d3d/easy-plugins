@@ -6,8 +6,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
 
-import java.util.ServiceLoader;
-
 import static com.nlocketz.internal.Constants.*;
 import static com.nlocketz.internal.Util.privateField;
 import static com.nlocketz.internal.Util.privateStaticField;
@@ -84,8 +82,7 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
                                 .addStatement("return null")
                                 .build());
 
-        ServiceLoader<EasyPluginPlugin> pluginServiceLoader = ServiceLoader.load(EasyPluginPlugin.class);
-        for (EasyPluginPlugin plugin : pluginServiceLoader) {
+        for (EasyPluginPlugin plugin : Util.getPluginLoader()) {
             for (MethodSpec methodSpec : plugin.registryMethods(marker)) {
                 classSpecBuilder = classSpecBuilder.addMethod(methodSpec);
             }

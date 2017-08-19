@@ -7,7 +7,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import java.util.Collections;
-import java.util.ServiceLoader;
 
 import static com.nlocketz.internal.Constants.*;
 import static com.nlocketz.internal.Util.publicFinalMethod;
@@ -54,8 +53,7 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
                 .addMethod(createBuilder.build())
                 .addMethod(createWithConfigBuilder.build());
 
-        ServiceLoader<EasyPluginPlugin> pluginServiceLoader = ServiceLoader.load(EasyPluginPlugin.class);
-        for (EasyPluginPlugin plugin : pluginServiceLoader) {
+        for (EasyPluginPlugin plugin : Util.getPluginLoader()) {
             for (MethodSpec methodSpec : plugin.pluginProviderMethods(marked)) {
                clazzBuilder = clazzBuilder.addMethod(methodSpec);
             }

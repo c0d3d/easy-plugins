@@ -1,6 +1,6 @@
 # Easy Plugins [![Build Status](https://travis-ci.org/c0d3d/easy-plugins.svg?branch=master)](https://travis-ci.org/c0d3d/easy-plugins) [![Maven Central](https://img.shields.io/maven-central/v/com.nlocketz.plugins/easy-plugins.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.nlocketz.plugins%22%20a%3A%22easy-plugins%22)
 
-Easy plugins is a library that lets you easily develop using a seamless service based architecture in Java!
+`easy-plugins` is a library that lets you easily develop using a seamless service based architecture in Java!
 
 ## Example
 
@@ -14,43 +14,51 @@ They are:
 
 Here is an example usage:
 
-	import com.nlocketz.Service;
+```java
+import com.nlocketz.Service;
 
-	@Service(value = "AdderService",
-		 serviceInterface = Adder.class,
-		 outputPackage = "com.nlocketz.adders.generated")
-	public @interface AdderService {
-		String value();
-	}
+@Service(value = "AdderService",
+	 serviceInterface = Adder.class,
+	 outputPackage = "com.nlocketz.adders.generated")
+public @interface AdderService {
+	String value();
+}
+```
 
 This example assumes that you have a class named `Adder` which easy-plugins will use to generate the service interface.
 Here is our interface:
 
-	public interface Adder {
-		int add(int x, int y);
-	}
+```java
+public interface Adder {
+	int add(int x, int y);
+}
+```
 
 That is all you need to do to create a new service!
 
 The problem now is you don't have any actual `Adder`s to use, so let's make one.
 
-	@AdderService("AccurateAdder")
-	public class Adder1 implements Adder {
-		@Override
-		public int add(int x, int y) {
-			return x+y;
-		}
+```java
+@AdderService("AccurateAdder")
+public class Adder1 implements Adder {
+	@Override
+	public int add(int x, int y) {
+		return x+y;
 	}
+}
+```
 
 and another one.
 
-	@AdderService("InaccurateAdder")
-	public class Adder2 implements Adder {
-		@Override
-		public int add(int x, int y) {
-			return x - y;
-		}
+```java
+@AdderService("InaccurateAdder")
+public class Adder2 implements Adder {
+	@Override
+	public int add(int x, int y) {
+		return x - y;
 	}
+}
+```
 
 Now you have a service with two providers named `AccurateAdder`, and `InaccurateAdder`.
 
@@ -58,10 +66,12 @@ To access them you use the class `AdderServiceRegistry` which has been generated
 
 Here we use both to add two numbers:
 
-	Adder accurate = AdderServiceRegistry.getAdderServiceByName("AccurateAdder");
-	Adder inaccurate = AdderServiceRegistry.getAdderServiceByName("InaccurateAdder");
-	assertEquals(3, accurate.add(1, 2));
-	assertEquals(-1, inaccurate.add(1, 2));
+```java
+Adder accurate = AdderServiceRegistry.getAdderServiceByName("AccurateAdder");
+Adder inaccurate = AdderServiceRegistry.getAdderServiceByName("InaccurateAdder");
+assertEquals(3, accurate.add(1, 2));
+assertEquals(-1, inaccurate.add(1, 2));
+```
 
 `AdderServiceRegistry` also contains another static method called `getAdderServiceByNameWithConfig` which takes a name and a `Map<String, String>` which it
 pass to your provider as a kind of configuration.
@@ -71,33 +81,67 @@ If you don't have a default constructor and `getAdderServiceByName` is called `C
 
 Here is an example `Adder` that uses configuration information:
 
-	import java.util.Map;
-	import com.nlocketz.adders.api.Adder;
-	import com.nlocketz.adders.api.AdderService;
+```java
+import java.util.Map;
+import com.nlocketz.adders.api.Adder;
+import com.nlocketz.adders.api.AdderService;
 
-	@AdderService("OffsetAdder")
-	public class Adder4 implements Adder {
-	    private int offset;
+@AdderService("OffsetAdder")
+public class Adder4 implements Adder {
+    private int offset;
 
-	    public Adder4(Map<String, String> config) {
-            offset = Integer.parseInt(config.get("offset"));
-	    }
+    public Adder4(Map<String, String> config) {
+        offset = Integer.parseInt(config.get("offset"));
+    }
 
 
-	    @Override
-        public int add(int x, int y) {
-            return y + x + offset;
-	    }
-	}
+    @Override
+    public int add(int x, int y) {
+        return y + x + offset;
+    }
+}
+```
 
 and the usage is like this:
 
-	Adder offset = AdderServiceRegistry.getAdderServiceByNameWithConfig("OffsetAdder",
-		Collections.singletonMap("offset", "3"));
-	Adder accurate = AdderServiceRegistry.getAdderServiceByNameWithConfig("AccurateAdder",
-		Collections.singletonMap("offset", "3"));
-	Adder inaccurate = AdderServiceRegistry.getAdderServiceByNameWithConfig("InaccurateAdder",
-		Collections.singletonMap("offset", "3")););
-	assertEquals(3, accurate.add(1, 2));
-	assertEquals(-1, inaccurate.add(1, 2));
-	assertEquals(3, offset.add(0, 0));
+```java
+Adder offset = AdderServiceRegistry.getAdderServiceByNameWithConfig("OffsetAdder",
+	Collections.singletonMap("offset", "3"));
+Adder accurate = AdderServiceRegistry.getAdderServiceByNameWithConfig("AccurateAdder",
+	Collections.singletonMap("offset", "3"));
+Adder inaccurate = AdderServiceRegistry.getAdderServiceByNameWithConfig("InaccurateAdder",
+	Collections.singletonMap("offset", "3")););
+assertEquals(3, accurate.add(1, 2));
+assertEquals(-1, inaccurate.add(1, 2));
+assertEquals(3, offset.add(0, 0));
+```
+
+## Plugins
+
+`easy-plugins` also has an experimental plugin API of its own, which can be used to extend the
+behavior of generated classes. For example, the [Guice Plugin](guice-plugin) extends the framework
+to include methods which accept Guice injectors. For example, one can do the following:
+
+```java
+import java.util.Map;
+import com.nlocketz.adders.api.Adder;
+import com.nlocketz.adders.api.AdderService;
+
+@AdderService("OffsetAdder")
+public class AdderN implements Adder {
+    private int offset;
+
+    public Adder4(Map<String, String> config) {
+        offset = Integer.parseInt(config.get("defaultOffset"));
+    }
+
+    public void setOffset(@Named("offset") Integer offset) {
+        this.offset = offset;
+    }
+
+    @Override
+    public int add(int x, int y) {
+        return y + x + offset;
+    }
+}
+```

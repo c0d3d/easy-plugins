@@ -1,23 +1,42 @@
 package com.nlocketz.internal;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.WildcardTypeName;
 
 import javax.annotation.processing.Filer;
-import javax.annotation.processing.FilerException;
-import javax.lang.model.element.*;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 public final class Util {
+
+    private static final ServiceLoader<EasyPluginPlugin> pluginLoader = ServiceLoader.load(EasyPluginPlugin.class, Util.class.getClassLoader());
+
     private Util() {
 
     }
@@ -200,5 +219,9 @@ public final class Util {
         if (mods.contains(Modifier.ABSTRACT) || e.getKind().isInterface()) {
             throw new EasyPluginException(e.toString() + " must be concrete to use as a service.");
         }
+    }
+
+    static ServiceLoader<EasyPluginPlugin> getPluginLoader() {
+        return pluginLoader;
     }
 }
