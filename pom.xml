@@ -22,6 +22,10 @@
             <name>Neil Locketz</name>
             <email>neil@nlocketz.com</email>
         </developer>
+        <developer>
+            <name>Philip Blair</name>
+            <email>philip@pblair.org</email>
+        </developer>
     </developers>
 
     <licenses>
