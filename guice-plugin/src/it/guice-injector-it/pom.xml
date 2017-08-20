@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.nlocketz.it</groupId>
-    <artifactId>sub-processor-it</artifactId>
+    <artifactId>guice-plugin-it</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <description>An integration test that tests a generated specialized plugin processor.</description>
+    <description>An integration test using the Guice plugin</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,40 +21,18 @@
         </dependency>
         <dependency>
             <groupId>@project.groupId@</groupId>
-            <artifactId>@project.artifactId@</artifactId>
+            <artifactId>easy-plugins</artifactId>
             <version>@project.version@</version>
-            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>@project.groupId@</groupId>
+            <artifactId>easy-plugins-guice-plugin</artifactId>
+            <version>@project.version@</version>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-invoker-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-                    <pomIncludes>
-                        <pomInclude>*/pom.xml</pomInclude>
-                    </pomIncludes>
-                    <showErrors>true</showErrors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>verify</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>install</goal>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <goals>
-                                <goal>verify</goal>
-                            </goals>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>

@@ -22,6 +22,10 @@
             <name>Neil Locketz</name>
             <email>neil@nlocketz.com</email>
         </developer>
+        <developer>
+            <name>Philip Blair</name>
+            <email>philip@pblair.org</email>
+        </developer>
     </developers>
 
     <licenses>
@@ -34,8 +38,10 @@
     <properties>
         <auto-service.version>1.0-rc3</auto-service.version>
         <javapoet.version>1.9.0</javapoet.version>
+        <guava.version>19.0</guava.version>
         <easy-plugins.compile.source>1.7</easy-plugins.compile.source>
         <easy-plugins.compile.target>1.7</easy-plugins.compile.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <scm>
@@ -47,6 +53,7 @@
 
     <modules>
         <module>core</module>
+        <module>guice-plugin</module>
     </modules>
 
     <dependencyManagement>
@@ -60,6 +67,11 @@
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
                 <version>${javapoet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

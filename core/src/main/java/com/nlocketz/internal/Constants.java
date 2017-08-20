@@ -73,7 +73,7 @@ public final class Constants {
             PluginRegistryFileGenerator.class.getResource("PluginRegistryFileGenerator.class"),
             ProcessorOutputCollection.class.getResource("ProcessorOutputCollection.class"),
             UserMarkerAnnotation.class.getResource("UserMarkerAnnotation.class"),
-            MarkedPluginClass.class.getResource("MarkedPluginClass$MutBool.class"),
+            EasyPluginPlugin.class.getResource("EasyPluginPlugin.class"),
             Util.class.getResource("Util.class"),
             ParameterSpec.class.getResource("ParameterSpec$1.class"),
             CodeBlock.class.getResource("CodeBlock$1.class"),
