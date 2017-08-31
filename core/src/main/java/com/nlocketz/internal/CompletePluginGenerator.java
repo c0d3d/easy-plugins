@@ -64,14 +64,13 @@ public final class CompletePluginGenerator {
                                                     RoundEnvironment roundEnv,
                                                     ProcessingEnvironment procEnv,
                                                     ProcessorOutputCollection output) {
+
         if (!annotationElement.getKind().isInterface()) {
             throw new IllegalStateException("Specialized processor must be given annotation");
         }
 
-        buildFiles(new UserMarkerAnnotation((TypeElement)annotationElement, ma, procEnv),
-                procEnv,
-                roundEnv,
-                output,
-                true);
+        new PluginProviderFileGenerator(procEnv, roundEnv)
+                .generate(new UserMarkerAnnotation((TypeElement)annotationElement, ma, procEnv), output);
+
     }
 }
