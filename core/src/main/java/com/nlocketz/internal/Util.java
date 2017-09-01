@@ -114,13 +114,17 @@ public final class Util {
         try {
             FileObject newRes = filer.createResource(StandardLocation.CLASS_OUTPUT, "", servicesFilePath);
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(newRes.openOutputStream()))) {
+
                 for (String s : content) {
                     writer.write(s);
+                    writer.write("\n");
                 }
+
                 for (String s : processorQNames) {
                     writer.append(s);
                     writer.append("\n");
                 }
+
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

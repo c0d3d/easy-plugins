@@ -6,6 +6,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Modifier;
 
 import static com.nlocketz.internal.Constants.*;
 
@@ -20,6 +21,7 @@ public class PluginProviderInterfaceFileGenerator extends AbstractPluginFileGene
     public void generate(UserMarkerAnnotation marker, ProcessorOutputCollection into) {
         TypeName providerTypeName = marker.getServiceInterfaceTypeName();
         TypeSpec.Builder typeBuilder = TypeSpec.interfaceBuilder(marker.getServiceInterfaceProviderName())
+                .addModifiers(Modifier.PUBLIC)
                 .addMethod(
                         Util.publicAbstractMethod(GET_NAME_METHOD_NAME, STRING_TYPE_NAME)
                                 .build())
