@@ -30,7 +30,7 @@ public class PluginProviderInterfaceFileGenerator extends AbstractPluginFileGene
                                 .build())
                 .addMethod(
                         Util.publicAbstractMethod(CREATE_NEW_WITH_CONFIG_METHOD_NAME, providerTypeName)
-                                .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME)
+                                .addParameter(CONFIG_TYPE_NAME, CONFIG_ARG_NAME)
                                 .build());
 
         for (EasyPluginPlugin plugin : Util.getPluginLoader()) {

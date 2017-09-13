@@ -1,22 +1,18 @@
 package com.nlocketz.plugins;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.Lists;
 import com.google.inject.Injector;
-import com.google.inject.Module;
+import com.nlocketz.internal.Constants;
 import com.nlocketz.internal.EasyPluginPlugin;
 import com.nlocketz.internal.MarkedPluginClass;
 import com.nlocketz.internal.UserMarkerAnnotation;
 import com.nlocketz.internal.Util;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,9 +30,6 @@ import java.util.Map;
  */
 @AutoService(EasyPluginPlugin.class)
 public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
-    private static final ClassName STRING_NAME = ClassName.get(String.class);
-    private static final ClassName MAP_NAME = ClassName.get(Map.class);
-    private static final ParameterizedTypeName MAP_STRING_STRING_NAME = ParameterizedTypeName.get(MAP_NAME, STRING_NAME, STRING_NAME);
     private static final TypeName INJECTOR_NAME = ClassName.get(Injector.class);
 
     @Override
@@ -59,7 +52,7 @@ public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
                 .returns(annotation.getServiceInterfaceTypeName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(String.class, "name")
-                .addParameter(MAP_STRING_STRING_NAME, "config")
+                .addParameter(Constants.CONFIG_TYPE_NAME, "config")
                 .addParameter(INJECTOR_NAME, "injector")
                 .beginControlFlow("if (getInstance().$L.containsKey($L))",
                         "pluginMap", "name")
@@ -83,7 +76,7 @@ public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
                 .addStatement("return ret")
                 .build();
         MethodSpec injectedWithConfig = Util.publicFinalMethod("createInjectedWithConfig", markedPluginClass.getTypeName())
-                .addParameter(MAP_STRING_STRING_NAME, "config")
+                .addParameter(Constants.CONFIG_TYPE_NAME, "config")
                 .addParameter(INJECTOR_NAME, "injector")
                 .addStatement("$T ret = this.createWithConfig($L)", markedPluginClass.getTypeName(), "config")
                 .addStatement("$L.injectMembers($L)", "injector", "ret")
@@ -101,7 +94,7 @@ public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
                 .addParameter(INJECTOR_NAME, "injector")
                 .build();
         MethodSpec createInjectedWithConfig = Util.publicAbstractMethod("createInjectedWithConfig", returnType)
-                .addParameter(MAP_STRING_STRING_NAME, "config")
+                .addParameter(Constants.CONFIG_TYPE_NAME, "config")
                 .addParameter(INJECTOR_NAME, "injector")
                 .build();
 

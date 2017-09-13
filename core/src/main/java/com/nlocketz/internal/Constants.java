@@ -52,6 +52,7 @@ public final class Constants {
             ParameterizedTypeName.get(MAP_CLASS_NAME, STRING_CLASS_NAME, STRING_CLASS_NAME);
     static final ParameterizedTypeName SET_WILD_EXTENDS_ELE =
             ParameterizedTypeName.get(SET_CLASS_NAME, Util.wildcardType(TYPE_ELEMENT_CLASS_NAME));
+    public static final TypeName CONFIG_TYPE_NAME = MAP_STRING_STRING_NAME;
 
     /* All names of methods */
     static final String GET_NAME_METHOD_NAME = "getProviderName";

@@ -42,7 +42,7 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
 
         MethodSpec.Builder createWithConfigBuilder =
                 publicFinalMethod(CREATE_NEW_WITH_CONFIG_METHOD_NAME, marked.getTypeName())
-                        .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME);
+                        .addParameter(CONFIG_TYPE_NAME, CONFIG_ARG_NAME);
         marked.addMapConstructorCall(createWithConfigBuilder, CONFIG_ARG_NAME);
 
         TypeSpec.Builder clazzBuilder = TypeSpec.classBuilder(className)
