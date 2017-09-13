@@ -47,6 +47,7 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
 
         TypeSpec.Builder clazzBuilder = TypeSpec.classBuilder(className)
                 .addSuperinterface(serviceInterfaceName)
+                .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build())
                 .addMethod(MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addMethod(getName)

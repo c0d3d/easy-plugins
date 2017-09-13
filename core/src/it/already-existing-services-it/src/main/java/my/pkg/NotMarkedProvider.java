@@ -16,7 +16,7 @@ public class NotMarkedProvider implements StupidProvider {
         return new NotMarked();
     }
 
-    public final NotMarked createWithConfig(Map<String, String> config) {
+    public final NotMarked createWithConfig(Object config) {
         return new NotMarked();
     }
 }

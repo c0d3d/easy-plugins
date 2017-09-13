@@ -33,6 +33,22 @@ public class AdderIT {
     public void testAdder3() {
         Adder interesting = AdderServiceRegistry.getAdderServiceByName("InterestingAdder");
         assertEquals(0, interesting.add(1, -1));
+        interesting = AdderServiceRegistry.getAdderServiceByNameWithConfig("InterestingAdder", Collections.singletonMap("bogus", "value"));
+        assertEquals(0, interesting.add(1, -1));
+    }
+
+    @Test
+    public void testAdder5() {
+        Adder typedOffset = AdderServiceRegistry.getAdderServiceByNameWithConfig("TypedOffsetAdder", 4);
+        assertEquals(4, typedOffset.add(0, 0));
+    }
+
+    @Test
+    public void testAdder6() {
+        Adder typedOffsetMulti = AdderServiceRegistry.getAdderServiceByNameWithConfig("TypedOffsetAdderMulti", 5);
+        assertEquals(5, typedOffsetMulti.add(0, 0));
+        typedOffsetMulti = AdderServiceRegistry.getAdderServiceByName("TypedOffsetAdderMulti");
+        assertEquals(1, typedOffsetMulti.add(1, 0));
     }
 
     @Test
