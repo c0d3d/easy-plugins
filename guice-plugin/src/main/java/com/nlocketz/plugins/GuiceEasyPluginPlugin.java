@@ -12,6 +12,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
@@ -39,7 +40,7 @@ public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
     private static final TypeName INJECTOR_NAME = ClassName.get(Injector.class);
 
     @Override
-    public List<MethodSpec> registryMethods(UserMarkerAnnotation annotation) {
+    public void updateRegistry(TypeSpec.Builder registry, UserMarkerAnnotation annotation) {
 
         MethodSpec injectedWithoutConfig = MethodSpec.methodBuilder("getInjected"+annotation.getServiceInterfaceName()+"ByName")
                 .returns(annotation.getServiceInterfaceTypeName())
@@ -68,11 +69,12 @@ public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
                 .addStatement("return null")
                 .build();
 
-        return Lists.newArrayList(injectedWithoutConfig, injectedWithConfig);
+        registry.addMethod(injectedWithoutConfig);
+        registry.addMethod(injectedWithConfig);
     }
 
     @Override
-    public List<MethodSpec> pluginProviderMethods(MarkedPluginClass markedPluginClass) {
+    public void updatePluginProvider(TypeSpec.Builder provider, MarkedPluginClass markedPluginClass) {
 
         MethodSpec injectedWithoutConfig = Util.publicFinalMethod("createInjected", markedPluginClass.getTypeName())
                 .addParameter(INJECTOR_NAME, "injector")
@@ -88,11 +90,12 @@ public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
                 .addStatement("return ret")
                 .build();
 
-        return Lists.newArrayList(injectedWithoutConfig, injectedWithConfig);
+        provider.addMethod(injectedWithoutConfig);
+        provider.addMethod(injectedWithConfig);
     }
 
     @Override
-    public List<MethodSpec> pluginProviderInterfaceMethods(UserMarkerAnnotation annotation) {
+    public void updatePluginProviderInterface(TypeSpec.Builder serviceInterface, UserMarkerAnnotation annotation) {
         TypeName returnType = annotation.getServiceInterfaceTypeName();
         MethodSpec createInjected = Util.publicAbstractMethod("createInjected", returnType)
                 .addParameter(INJECTOR_NAME, "injector")
@@ -101,6 +104,8 @@ public class GuiceEasyPluginPlugin implements EasyPluginPlugin {
                 .addParameter(MAP_STRING_STRING_NAME, "config")
                 .addParameter(INJECTOR_NAME, "injector")
                 .build();
-        return Lists.newArrayList(createInjected, createInjectedWithConfig);
+
+        serviceInterface.addMethod(createInjected);
+        serviceInterface.addMethod(createInjectedWithConfig);
     }
 }

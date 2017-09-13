@@ -83,9 +83,7 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
                                 .build());
 
         for (EasyPluginPlugin plugin : Util.getPluginLoader()) {
-            for (MethodSpec methodSpec : plugin.registryMethods(marker)) {
-                classSpecBuilder = classSpecBuilder.addMethod(methodSpec);
-            }
+            plugin.updateRegistry(classSpecBuilder, marker);
         }
 
         TypeSpec classSpec = classSpecBuilder.build();

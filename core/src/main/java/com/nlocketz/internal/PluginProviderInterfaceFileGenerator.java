@@ -34,9 +34,7 @@ public class PluginProviderInterfaceFileGenerator extends AbstractPluginFileGene
                                 .build());
 
         for (EasyPluginPlugin plugin : Util.getPluginLoader()) {
-            for (MethodSpec methodSpec : plugin.pluginProviderInterfaceMethods(marker)) {
-                typeBuilder = typeBuilder.addMethod(methodSpec);
-            }
+            plugin.updatePluginProviderInterface(typeBuilder, marker);
         }
 
         TypeSpec type = typeBuilder.build();

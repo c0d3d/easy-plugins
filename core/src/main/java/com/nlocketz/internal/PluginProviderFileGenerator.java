@@ -54,9 +54,7 @@ class PluginProviderFileGenerator extends AbstractPluginFileGenerator {
                 .addMethod(createWithConfigBuilder.build());
 
         for (EasyPluginPlugin plugin : Util.getPluginLoader()) {
-            for (MethodSpec methodSpec : plugin.pluginProviderMethods(marked)) {
-               clazzBuilder = clazzBuilder.addMethod(methodSpec);
-            }
+            plugin.updatePluginProvider(clazzBuilder, marked);
         }
 
         TypeSpec clazz = clazzBuilder.build();

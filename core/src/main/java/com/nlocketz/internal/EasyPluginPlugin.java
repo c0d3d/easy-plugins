@@ -2,6 +2,7 @@ package com.nlocketz.internal;
 
 import com.nlocketz.Service;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 
 import java.util.List;
 
@@ -16,27 +17,26 @@ import java.util.List;
 public interface EasyPluginPlugin {
 
     /**
-     * Produces a list of static methods which are to be added to the generated registry.
+     * Modifies the given {@code easy-plugins} registry.
+     * @param registry The registry to modify
      * @param annotation An annotated service class (i.e. one annotated with {@link Service})
-     * @return A list of static registry methods
      */
-    List<MethodSpec> registryMethods(UserMarkerAnnotation annotation);
+    void updateRegistry(TypeSpec.Builder registry, UserMarkerAnnotation annotation);
 
     /**
-     * Produces a list of implementations for the methods returned by {@link #pluginProviderInterfaceMethods(UserMarkerAnnotation)}
-     * for the given annotated class.
+     * Modifies the given implementation of this {@link Service}'s provider associated
+     * with the given annotated class.
+     * @param provider The SPI implementation to modify
      * @param markedPluginClass A class which has been annotated with an annotation that is
      *                          annotated with {@link Service} (try saying that 10 times fast)
-     * @return The implementations of the plugin provider methods.
      */
-    List<MethodSpec> pluginProviderMethods(MarkedPluginClass markedPluginClass);
+    void updatePluginProvider(TypeSpec.Builder provider, MarkedPluginClass markedPluginClass);
 
     /**
-     * Produces a list of interface method declarations to be placed in the auto-generated
-     * interface for the given service class.
+     * Modifies the auto-generated interface for the given service class.
+     * @param serviceInterface The SPI interface to modify
      * @param annotation An annotated service class (i.e. one annotated with {@link Service})
-     * @return The interface method declarations
      */
-    List<MethodSpec> pluginProviderInterfaceMethods(UserMarkerAnnotation annotation);
+    void updatePluginProviderInterface(TypeSpec.Builder serviceInterface, UserMarkerAnnotation annotation);
 
 }
