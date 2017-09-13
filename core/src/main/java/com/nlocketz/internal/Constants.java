@@ -1,5 +1,6 @@
 package com.nlocketz.internal;
 
+import com.nlocketz.ConfigurationConstructor;
 import com.nlocketz.Service;
 import com.squareup.javapoet.*;
 
@@ -52,6 +53,7 @@ public final class Constants {
             ParameterizedTypeName.get(MAP_CLASS_NAME, STRING_CLASS_NAME, STRING_CLASS_NAME);
     static final ParameterizedTypeName SET_WILD_EXTENDS_ELE =
             ParameterizedTypeName.get(SET_CLASS_NAME, Util.wildcardType(TYPE_ELEMENT_CLASS_NAME));
+    public static final TypeName CONFIG_TYPE_NAME = TypeName.get(Object.class);
 
     /* All names of methods */
     static final String GET_NAME_METHOD_NAME = "getProviderName";
@@ -111,6 +113,7 @@ public final class Constants {
             ClassName.class.getResource("ClassName.class"),
             ParameterizedTypeName.class.getResource("ParameterizedTypeName.class"),
             AnnotationSpec.class.getResource("AnnotationSpec$Builder.class"),
-            Service.class.getResource("Service.class")
+            Service.class.getResource("Service.class"),
+            ConfigurationConstructor.class.getResource("ConfigurationConstructor.class")
     };
 }

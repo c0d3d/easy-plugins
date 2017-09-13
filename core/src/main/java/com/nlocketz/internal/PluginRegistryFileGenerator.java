@@ -73,7 +73,7 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
                                 .returns(marker.getServiceInterfaceTypeName())
                                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                                 .addParameter(String.class, PROVIDER_NAME_ARG_NAME)
-                                .addParameter(MAP_STRING_STRING_NAME, CONFIG_ARG_NAME)
+                                .addParameter(CONFIG_TYPE_NAME, CONFIG_ARG_NAME)
                                 .beginControlFlow("if (getInstance().$L.containsKey($L))",
                                         PLUGIN_MAP, PROVIDER_NAME_ARG_NAME)
                                 .addStatement("return getInstance().$L.get($L).createWithConfig($L)",
@@ -83,9 +83,7 @@ class PluginRegistryFileGenerator extends AbstractPluginFileGenerator {
                                 .build());
 
         for (EasyPluginPlugin plugin : Util.getPluginLoader()) {
-            for (MethodSpec methodSpec : plugin.registryMethods(marker)) {
-                classSpecBuilder = classSpecBuilder.addMethod(methodSpec);
-            }
+            plugin.updateRegistry(classSpecBuilder, marker);
         }
 
         TypeSpec classSpec = classSpecBuilder.build();
