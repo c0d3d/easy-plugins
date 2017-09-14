@@ -45,6 +45,7 @@ public class MarkedPluginClass {
 
     MarkedPluginClass(TypeElement clazzElement,
                       String serviceName,
+                      String outputPkg,
                       Types types,
                       Elements elements) {
 
@@ -67,7 +68,9 @@ public class MarkedPluginClass {
         if (this.configConstructor != null) {
             int arity = ((ExecutableElement)this.configConstructor).getParameters().size();
             if (arity > 1) {
-                throw new EasyPluginException(String.format("Error in class %s. Constructors annotated with @ConfigurationConstructor should only have zero or one arguments",
+                throw new EasyPluginException(
+                        String.format("Error in class %s. Constructors annotated with "
+                                        + "@ConfigurationConstructor should only have zero or one arguments",
                         clazzElement.getSimpleName()));
             }
             hasEither = true;
@@ -95,7 +98,15 @@ public class MarkedPluginClass {
 
         // Get type of configuration
         if (this.configConstructor != null) {
+            // Check that the config constructor is actually visible.
+            Util.checkElementVisibility(elements, configConstructor, outputPkg);
             this.configType = this.constructorSignatures.get(this.configConstructor).get(0);
+        }
+
+        Element defaultConstructor = getConstructor();
+        if (defaultConstructor != null) {
+            // We have to check this one too.
+            Util.checkElementVisibility(elements, defaultConstructor, outputPkg);
         }
 
         if (!hasEither) {
@@ -301,7 +312,9 @@ public class MarkedPluginClass {
 
     /**
      * Adds a call to the default constructor for this marked service class to the given method builder.
-     * If the "default" means an empty map, one will be supplied.
+     * If the "default" means an empty map, or list, one will be supplied.
+     * Additionally, default for unknown Object types is {@code null}, and defaults for primitives are their Java
+     * default values.
      * @param getByNameBuilder The builder to add the constructions to.
      */
     public void addDefaultConstructorCall(MethodSpec.Builder getByNameBuilder) {

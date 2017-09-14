@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import static javax.lang.model.element.ElementKind.*;
+
 public final class Util {
 
     private static final ServiceLoader<EasyPluginPlugin> pluginLoader = ServiceLoader.load(EasyPluginPlugin.class, Util.class.getClassLoader());
@@ -163,53 +165,114 @@ public final class Util {
         }
     }
 
-    private static boolean isNestedClass(TypeElement element) {
+    private static boolean isNestedClass(Element element) {
         Element enclosing = element.getEnclosingElement();
         return enclosing != null && enclosing.getKind().isClass();
     }
 
-    private static void checkElementVisibilityNoNest(Elements eles, TypeElement target, String from) {
-        Set<Modifier> targetMods = target.getModifiers();
-        PackageElement targetPkg = eles.getPackageOf(target);
 
-        // TODO this is terrible
-        if ((!targetPkg.getQualifiedName().toString().equals(from)
-                || targetMods.contains(Modifier.PROTECTED)
-                || targetMods.contains(Modifier.PRIVATE))
-                && !targetMods.contains(Modifier.PUBLIC)) {
-            throw new EasyPluginException("Access modifiers block usage of " + target.toString());
+
+    /**
+     * Checks that {@code target} is visible from {@code fromPkg}.
+     * If {@code fromPkg} is {@code null}, we take that to mean that {@code target} should be visible everywhere.
+     * Throws an {@link EasyPluginException} with a proper error message if the target element does not match
+     * the visibility constraint.
+     * @param eles Elements
+     * @param target The target element to check for visibility
+     * @param fromPkg The package to check for visibility from.
+     *                Null indicates it needs to be globally visible.
+     * @throws EasyPluginException if it's not visible
+     */
+    static void checkElementVisibility(Elements eles, Element target, String fromPkg) {
+        // I would have used a switch, but that messed up compilation somehow.
+        // I guess it generated another class file?
+        // Anyways, this works.
+        if (target.getKind().isClass() || target.getKind().isInterface()) {
+            checkClassVisibility(eles, (TypeElement) target, fromPkg);
+        } else if (target.getKind().isField()
+                || target.getKind() == ElementKind.METHOD
+                || target.getKind() == ElementKind.CONSTRUCTOR) {
+            checkMemberVisibility(eles, target, fromPkg);
+        } else if (target.getKind() == ElementKind.ENUM_CONSTANT) {
+            checkClassVisibility(eles, (TypeElement) target.getEnclosingElement(), fromPkg);
+        } else {
+            // This isn't an EasyPluginException because our code shouldn't be dumb
+            // enough to check the visibility of any other kind of element.
+            throw new IllegalArgumentException("Bad kind for element visibility check: " + target.getKind());
         }
     }
 
-    static void checkElementVisibility(Elements eles, TypeElement target, String from) {
+    private static void simpleVisibility(Set<Modifier> targetMods,
+                                         PackageElement targetPkg,
+                                         String fromPkg,
+                                         Element target) {
+        if (fromPkg == null) {
+            if (!targetMods.contains(Modifier.PUBLIC)) {
+                throw new EasyPluginException(target.toString() + " must be public.");
+            }
+        } else {
+            // TODO this is terrible
+            if ((!targetPkg.getQualifiedName().toString().equals(fromPkg)
+                    || targetMods.contains(Modifier.PROTECTED)
+                    || targetMods.contains(Modifier.PRIVATE))
+                    && !targetMods.contains(Modifier.PUBLIC)) {
+                throw new EasyPluginException("Access modifiers block usage of " + target.toString());
+            }
+        }
+    }
+
+    private static void checkMemberVisibility(Elements eles, Element target, String fromPkg) {
+
+        // Obviously the surrounding type needs to be visible
+        checkClassVisibility(eles, (TypeElement)target.getEnclosingElement(), fromPkg);
+
+        PackageElement pe = eles.getPackageOf(target);
+
+        // Check the member's visibility
+        simpleVisibility(target.getModifiers(), pe, fromPkg, target);
+    }
+
+    private static void checkClassVisibility(Elements eles, TypeElement target, String fromPkg) {
         Set<Modifier> targetMods = target.getModifiers();
         if (!isNestedClass(target)) {
-            checkElementVisibilityNoNest(eles, target, from);
+            simpleVisibility(target.getModifiers(), eles.getPackageOf(target), fromPkg, target);
         } else {
             Element surround = target.getEnclosingElement();
 
-            if (surround.getKind() != ElementKind.CLASS
-                    && surround.getKind() != ElementKind.INTERFACE) {
-                throw new IllegalStateException("?!?!: "+surround.getKind());
+            if (surround.getKind() != CLASS
+                    && surround.getKind() != INTERFACE
+                    // Not sure if that is allowed, but we include it anyways.
+                    && surround.getKind() != ENUM) {
+                throw new IllegalStateException(
+                        target.toString() + " is not nested? " + surround.toString());
             }
 
             TypeElement enclosingType = (TypeElement) surround;
 
             // The surrounding class must be visible for us to see the nested class
-            if (!isElementVisibleFrom(eles, enclosingType, from)) {
+            if (!isElementVisibleFrom(eles, enclosingType, fromPkg)) {
                 throw new EasyPluginException(enclosingType.toString()
                         + " is not visible from output package; need for access to " + target.toString());
             }
             // Nested class must be static since we don't have an enclosing instance
             if (!targetMods.contains(Modifier.STATIC)) {
-                throw new EasyPluginException(target.toString() + " must be static to get service instance.");
+                throw new EasyPluginException(target.toString() + " must be static.");
             }
 
-            checkElementVisibilityNoNest(eles, target, from);
+            simpleVisibility(target.getModifiers(), eles.getPackageOf(target), fromPkg, target);
         }
     }
 
-    private static boolean isElementVisibleFrom(Elements eles, TypeElement target, String from) {
+    /**
+     * Same as {@link #checkElementVisibility(Elements, Element, String)}, but returns the result instead of
+     * throwing an exception.
+     * @param eles Elements
+     * @param target The target element to check for visibility
+     * @param from The package to check from, null means the target element should be globally visible.
+     * @return {@code true} if the element matches the visibility constraint imposed by {@code from}.
+     * @see #checkElementVisibility(Elements, Element, String)
+     */
+    private static boolean isElementVisibleFrom(Elements eles, Element target, String from) {
         try {
             checkElementVisibility(eles, target, from);
             return true;

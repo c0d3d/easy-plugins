@@ -120,7 +120,7 @@ public class UserMarkerAnnotation {
                                 + serviceBaseName + " does not have the correct name field: " + individualNameKey);
             }
 
-            result.add(new MarkedPluginClass(element, nameValue.toString(), types, eleUtils));
+            result.add(new MarkedPluginClass(element, nameValue.toString(), getOutputPackage(eleUtils), types, eleUtils));
         }
 
         return result;
