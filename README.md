@@ -73,11 +73,13 @@ assertEquals(3, accurate.add(1, 2));
 assertEquals(-1, inaccurate.add(1, 2));
 ```
 
-`AdderServiceRegistry` also contains another static method called `getAdderServiceByNameWithConfig` which takes a name and a `Map<String, String>` which it
+`AdderServiceRegistry` also contains another static method called `getAdderServiceByNameWithConfig` which takes a name and an `Object` which it
 pass to your provider as a kind of configuration.
 
-Your provider can choose to subscribe to these configuration calls by created a constructor that consumes a `Map<String, String>`. If you don't have one, the default constructor will be called.
-If you don't have a default constructor and `getAdderServiceByName` is called `Collections.emptyMap()` will be provided as the argument to the `Map<String, String>` constructor.
+Your provider can choose to subscribe to these configuration calls by created a constructor that consumes an argument. If you don't have one, the default constructor will be called.
+If you don't have a default constructor and `getAdderServiceByName` is called, a default value (an empty map for `Map`, and empty list for `List`, `0` for numbers, `false` for
+booleans, and `null` for other objects) will be provided as the argument to the one-argument constructor. Annotating a constructor with `@ConfigurationConstructor` will override this
+behavior and cause that constructor to be used when creating with a configuration.
 
 Here is an example `Adder` that uses configuration information:
 
@@ -123,7 +125,6 @@ behavior of generated classes. For example, the [Guice Plugin](guice-plugin) ext
 to include methods which accept Guice injectors. For example, one can do the following:
 
 ```java
-import java.util.Map;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.nlocketz.adders.api.Adder;
@@ -133,8 +134,8 @@ import com.nlocketz.adders.api.AdderService;
 public class AdderN implements Adder {
     private int offset;
 
-    public Adder4(Map<String, String> config) {
-        offset = Integer.parseInt(config.get("defaultOffset"));
+    public Adder4(int offset) {
+        this.offset = offset;
     }
 
     @Inject(optional = true)
@@ -147,4 +148,15 @@ public class AdderN implements Adder {
         return y + x + offset;
     }
 }
+```
+
+Additionally, there is a [Jackson Plugin](jackson-plugin), which adds a Jackson deserializer to
+the generated registry. For example, the above class can be deserialized from the following JSON
+string (corresponding to a construction with no configuration):
+```
+"OffsetAdder"
+```
+If a configuration is desired, it can be used using the configuration type's JSON serialization:
+```
+{"OffsetAdder": 5}
 ```
