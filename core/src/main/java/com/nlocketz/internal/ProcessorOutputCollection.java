@@ -68,6 +68,7 @@ public class ProcessorOutputCollection {
     public void writeContents(Filer filer) {
         for (Map.Entry<String, Set<TypeSpec>> newTypes : outputClasses.entrySet()) {
             for (TypeSpec type : newTypes.getValue()) {
+                type = type.toBuilder().addJavadoc(Constants.AUTOGEN_COMMENT).build();
                 writeFile(filer,
                         JavaFile.builder(newTypes.getKey(), type).build());
             }

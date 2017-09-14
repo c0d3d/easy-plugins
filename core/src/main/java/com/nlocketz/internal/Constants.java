@@ -60,6 +60,13 @@ public final class Constants {
     static final String CREATE_NEW_METHOD_NAME = "create";
     static final String CREATE_NEW_WITH_CONFIG_METHOD_NAME = "createWithConfig";
 
+    public static final CodeBlock AUTOGEN_COMMENT = CodeBlock.builder()
+            .add("Created by easy-plugins.\n")
+            .add("This is an auto-generated file.\n")
+            .add("Do not edit! All changes made to it will be lost.\n")
+            .build();
+
+
     public static URL[] classesToCopy = new URL[]{
             AbstractPluginFileGenerator.class.getResource("AbstractPluginFileGenerator.class"),
             CompletePluginGenerator.class.getResource("CompletePluginGenerator.class"),
