@@ -54,6 +54,7 @@
     <modules>
         <module>core</module>
         <module>guice-plugin</module>
+        <module>jackson-plugin</module>
     </modules>
 
     <dependencyManagement>
