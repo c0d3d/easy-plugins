@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>easy-plugins</artifactId>
-    <version>0.2.4</version>
+    <version>0.2.5-SNAPSHOT</version>
     <name>easy-plugins</name>
 
     <parent>
         <groupId>com.nlocketz.plugins</groupId>
         <artifactId>easy-plugins-parent</artifactId>
-        <version>0.2.4</version>
+        <version>0.2.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>
