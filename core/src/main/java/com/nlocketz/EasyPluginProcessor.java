@@ -21,7 +21,7 @@ import java.util.Set;
 
 
 @SupportedAnnotationTypes("com.nlocketz.Service")
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_7)
 @AutoService(Processor.class)
 public final class EasyPluginProcessor extends AbstractProcessor {
     private static final byte[] BUFFER = new byte[0x100];
