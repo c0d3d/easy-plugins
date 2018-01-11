@@ -4,7 +4,7 @@
 
     <groupId>com.nlocketz.plugins</groupId>
     <artifactId>easy-plugins-parent</artifactId>
-    <version>0.2.3</version>
+    <version>0.2.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -48,7 +48,7 @@
         <url>git@github.com:c0d3d/easy-plugins.git</url>
         <connection>scm:git:git://github.com/c0d3d/easy-plugins.git</connection>
         <developerConnection>scm:git:git@github.com:c0d3d/easy-plugins.git</developerConnection>
-        <tag>easy-plugins-parent-0.2.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
