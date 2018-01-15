@@ -14,7 +14,7 @@
     </parent>
 
     <name>easy-plugins-parent</name>
-    <url>https://github.com/c0d3d/EZServiceProvider</url>
+    <url>https://github.com/c0d3d/easy-plugins</url>
     <description>Annotation directed service providers, made easy!</description>
 
     <developers>
