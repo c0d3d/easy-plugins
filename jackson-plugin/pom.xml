@@ -12,7 +12,7 @@
     <description>Easy-plugins plugin providing Jackson deserialization support. Serialization is currently not supported.</description>
 
     <properties>
-        <easy-plugins.jackson.version>2.9.1</easy-plugins.jackson.version>
+        <easy-plugins.jackson.version>2.9.9.1</easy-plugins.jackson.version>
     </properties>
 
     <dependencies>
